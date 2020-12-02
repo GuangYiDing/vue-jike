@@ -13,7 +13,7 @@
         class="avatar"
         width="40px"
         height="40px"
-        :src="this.perview + info.userAvatar"
+        :src="info.userAvatar"
       >
         <template v-slot:loading> <van-loading /> </template
       ></van-image>
@@ -31,6 +31,17 @@
       <div class="content" @click="showAcitonSheet">
         {{ info.content }}
       </div>
+      <van-image
+        :src="image"
+        @click="viewImage"
+        v-for="image in info.images"
+        :key="image"
+        width="80"
+      >
+        <template v-slot:loading>
+          <van-loading type="spinner" size="20" />
+        </template>
+      </van-image>
       <div class="show" v-if="info.hasReply">
         <div class="replys" v-for="reply in info.replys" :key="reply.id">
           <div class="line">
@@ -46,7 +57,7 @@
 </template>
 
 <script>
-import Iurl from "../../axios/constants";
+import { ImagePreview } from "vant";
 export default {
   name: "Commnet",
   props: ["info"],
@@ -55,7 +66,6 @@ export default {
       actionSheetVisible: false,
       actions: [{ name: "回复" }, { name: "复制" }, { name: "分享" }],
       subReplyUser: "",
-      perview: Iurl.perview,
     };
   },
 
@@ -82,6 +92,9 @@ export default {
       this.$emit("replyUserName", name);
     },
     actionSheetOnCancel() {},
+    viewImage() {
+      ImagePreview(this.info.images);
+    },
   },
 };
 </script>

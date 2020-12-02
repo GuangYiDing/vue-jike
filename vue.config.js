@@ -6,6 +6,7 @@ module.exports = {
         : '/',
     assetsDir: 'assets',
     devServer: {
+        open: true,
         host: "0.0.0.0",
         proxy: {
             '/gitee': {
@@ -16,7 +17,7 @@ module.exports = {
                 }
             },
             '/jike-api': {
-                target: process.env.NODE_ENV === 'production' ? 'http://jike.cocode.me:8081/jike-api' : 'http://127.0.0.1:8081/jike-api',
+                target: 'http://127.0.0.1:8081/jike-api',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/jike-api': ''

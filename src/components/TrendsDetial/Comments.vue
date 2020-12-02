@@ -14,6 +14,7 @@
 
 <script>
 import Comment from "./Comment";
+import Iurl from "../../axios/constants";
 export default {
   name: "Comments",
   components: {
@@ -89,7 +90,16 @@ export default {
           params: { trendId: this.$route.params.id },
         })
         .then((resp) => {
-          this.commList = resp.data.data;
+          this.commList = resp.data.data.map((item) => {
+            let imagesArr = item.images.split(",");
+            let perviewArr = imagesArr.map((i) => {
+              return (i = Iurl.perview + i);
+            });
+            item.images = perviewArr;
+            item.userAvatar = Iurl.perview + item.userAvatar;
+            item.zoneAvatar = Iurl.perview + item.zoneAvatar;
+            return item;
+          });
         })
         .catch((err) => {
           console.log(err);

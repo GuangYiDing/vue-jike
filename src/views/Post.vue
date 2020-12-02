@@ -1,57 +1,61 @@
 <template>
   <div class="Post">
-    <van-sticky>
-      <van-nav-bar
-        title="发布新动态"
-        left-text="返回"
-        right-text="发布"
-        left-arrow
-        @click-left="
-          () => {
-            this.$router.go(-1);
-          }
-        "
-        @click-right="postTrend"
-      />
-    </van-sticky>
-    <van-field
-      readonly
-      clickable
-      :value="zone"
-      placeholder="选择发布的圈子"
-      @click="showPicker = true"
-    />
-    <van-popup v-model="showPicker" round position="bottom">
-      <van-picker
-        show-toolbar
-        :columns="zomes"
-        @cancel="showPicker = false"
-        @confirm="zoneConfirm"
-      />
-    </van-popup>
-    <van-field
-      v-model="message"
-      rows="2"
-      autosize
-      type="textarea"
-      maxlength="300"
-      placeholder="分享你的想法..."
-      show-word-limit
-      @focus="emojiVisible = false"
-      @blur="emojiVisible = true"
-    />
-    <div class="upload">
-      <van-uploader
-        v-model="fileList"
-        :max-count="9"
-        :max-size="1024 * 1024"
-        @oversize="onOversize"
-        multiple
-      />
+    <div class="top">
+      <van-sticky>
+        <van-nav-bar
+          title="发布新动态"
+          left-text="返回"
+          right-text="发布"
+          left-arrow
+          @click-left="
+            () => {
+              this.$router.go(-1);
+            }
+          "
+          @click-right="postTrend"
+        />
+      </van-sticky>
     </div>
-
-    <van-divider>表情</van-divider>
-    <Emoji :capacity="18" @addEmoji="emojiList" v-show="emojiVisible" />
+    <div class="mid">
+      <van-field
+        readonly
+        clickable
+        :value="zone"
+        placeholder="选择发布的圈子"
+        @click="showPicker = true"
+      />
+      <van-popup v-model="showPicker" round position="bottom">
+        <van-picker
+          show-toolbar
+          :columns="zomes"
+          @cancel="showPicker = false"
+          @confirm="zoneConfirm"
+        />
+      </van-popup>
+      <van-field
+        v-model="message"
+        rows="4"
+        autosize
+        type="textarea"
+        placeholder="分享你的想法..."
+        show-word-limit
+        @focus="emojiVisible = false"
+        @blur="emojiVisible = true"
+      />
+      <div class="upload">
+        <van-uploader
+          v-model="fileList"
+          :max-count="9"
+          :max-size="1024 * 1024"
+          @oversize="onOversize"
+          multiple
+        />
+      </div>
+    </div>
+    <div class="bot">
+      <van-divider>表情</van-divider>
+      <Emoji :capacity="18" @addEmoji="emojiList" v-show="emojiVisible" />
+    </div>
   </div>
 </template>
 
@@ -196,6 +200,8 @@ export default {
 <style>
 .Post {
   height: 100%;
+  display: flex;
+  flex-flow: column;
 }
 .van-divider {
   margin: 0;
@@ -212,11 +218,10 @@ export default {
 .van-uploader__wrapper {
   justify-content: space-around;
 }
-.upload {
-  margin-bottom: 25%;
+.Post .top {
+  flex: 0 1 auto;
 }
-.Emoji {
-  position: sticky;
-  bottom: 0;
+.Post .mid {
+  flex: 1 1 auto;
 }
 </style>

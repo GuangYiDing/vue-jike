@@ -37,11 +37,7 @@
       <div class="middle">
         <div class="zone-title">{{ info.zoneName }}</div>
         <div class="zone-title-desc van-ellipsis">
-          {{
-            this.info.description.length > 15
-              ? info.description.slice(0, 12) + "..."
-              : info.description
-          }}
+          {{ info.description }}
         </div>
       </div>
       <div class="join fr">
@@ -84,6 +80,10 @@ export default {
         this.$store.state.recommendList.forEach((element) => {
           if (this.$route.params.id == element.trendId) {
             this.info = element;
+            this.info.description =
+              element.description.length > 15
+                ? element.description.slice(0, 12) + "..."
+                : element.description;
           }
         });
       }

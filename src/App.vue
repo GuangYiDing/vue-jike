@@ -1,18 +1,25 @@
 <template>
   <div id="app">
-    <keep-alive>
+    <keep-alive include="Trends,Friends">
       <!-- 需要缓存的视图组件 -->
-      <router-view v-if="$route.meta.keepAlive"> </router-view>
+      <router-view v-if="isRouterAlive"></router-view>
     </keep-alive>
-    <!-- 不需要缓存的视图组件 -->
-    <router-view v-if="!$route.meta.keepAlive"></router-view>
   </div>
 </template>
 
 <script>
 export default {
   name: "App",
-  components: {},
+  provide() {
+    return {
+      reload: this.reload,
+    };
+  },
+  data() {
+    return {
+      isRouterAlive: true,
+    };
+  },
   created() {
     this.stopF5Refresh();
   },
@@ -37,6 +44,10 @@ export default {
       //   history.pushState(null, null, window.location.href);
       // });
     },
+    reload() {
+      this.isRouterAlive = false;
+      this.$nextTick(() => (this.isRouterAlive = true));
+    },
   },
 };
 </script>
@@ -47,6 +58,8 @@ body {
   height: 100%;
   overflow: hidden;
   overflow-y: auto;
+  padding: 0;
+  margin: 0;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

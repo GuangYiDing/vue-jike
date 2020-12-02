@@ -67,6 +67,7 @@ export default {
   components: {
     Emoji,
   },
+  inject: ["reload"],
   data() {
     return {
       uploads: [],
@@ -152,6 +153,7 @@ export default {
           )
           .then((resp) => {
             this.$toast.success(resp.data);
+            this.reload();
           })
           .catch((err) => {
             this.$toast.fail(err);
@@ -165,7 +167,7 @@ export default {
 <style>
 .Reply {
   box-shadow: 0 -1px 12px 0 rgba(0, 0, 0, 0.1);
-  position: fixed;
+  position: sticky;
   width: 100%;
   bottom: 0;
   color: #8e8e8e8e;
@@ -203,4 +205,5 @@ export default {
   top: 9%;
   right: -22%;
 }
+
 </style>
