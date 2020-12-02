@@ -77,13 +77,13 @@ export default {
 .Profile {
   background-size: 100%;
 }
-.top {
+.Profile .top {
   margin: 12px;
 }
-.top .one-line {
+.Profile .top .one-line {
   display: flex;
 }
-.top .one-line .btn {
+.Profile .top .one-line .btn {
   display: flex;
   align-items: center;
 }
@@ -98,14 +98,14 @@ export default {
   position: relative;
   left: 65%;
 }
-.top .nike,
-.top .follow {
+.Profile .top .nike,
+.Profile .top .follow {
   font-size: 900;
 }
-.top span {
+.Profile .top span {
   font-size: 12px;
 }
-.bottom {
+.Profile .bottom {
   border-radius: 25px;
   position: relative;
   top: 20%;

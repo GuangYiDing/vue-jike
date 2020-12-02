@@ -5,7 +5,6 @@
       :actions="actions"
       @select="acitonSheetOnSelect"
       cancel-text="取消"
-      @cancel="actionSheetOnCancel"
     />
     <div class="left">
       <van-image
@@ -13,7 +12,7 @@
         class="avatar"
         width="40px"
         height="40px"
-        :src="info.userAvatar"
+        :src="comm.userAvatar"
       >
         <template v-slot:loading> <van-loading /> </template
       ></van-image>
@@ -21,33 +20,44 @@
     <div class="right">
       <div class="header">
         <div class="middle">
-          <div class="userName">{{ info.userName }}</div>
-          <span>{{ info.createTime }}</span>
+          <div class="userName">{{ comm.userName }}</div>
+          <span>{{ comm.createTime }}</span>
         </div>
         <div class="like fr">
-          <van-icon name="like-o" /> <span>{{ info.likesCount }}</span>
+          <van-icon name="like-o" /> <span>{{ comm.likesCount }}</span>
         </div>
       </div>
-      <div class="content" @click="showAcitonSheet">
-        {{ info.content }}
+      <div class="content" @click="showAcitonSheet()">
+        {{ comm.content }}
+        <div class="content-images">
+          <van-image
+            :src="image"
+            @click="viewImage"
+            v-for="image in comm.images"
+            :key="image"
+            width="80"
+          >
+            <template v-slot:loading>
+              <van-loading type="spinner" size="20" />
+            </template>
+          </van-image>
+        </div>
       </div>
-      <van-image
-        :src="image"
-        @click="viewImage"
-        v-for="image in info.images"
-        :key="image"
-        width="80"
-      >
-        <template v-slot:loading>
-          <van-loading type="spinner" size="20" />
-        </template>
-      </van-image>
-      <div class="show" v-if="info.hasReply">
-        <div class="replys" v-for="reply in info.replys" :key="reply.id">
-          <div class="line">
-            <div class="user fl">{{ reply.user }}</div>
-            <div class="replyContent" @click="showSubAcitonSheet(reply.user)">
-              {{ reply.content }}
+      <!-- 子评论 -->
+      <div class="childComm" v-for="child in childComm" :key="child.id">
+        <div class="show" v-if="child.parentId == comm.commId">
+          <div class="replys">
+            <div class="line">
+              <div class="user fl">{{ child.userName }}</div>
+              <div class="replyContent" @click="showSubAcitonSheet(child)">
+                {{ child.content }}
+                <el-link
+                  type="primary"
+                  @click="viewChilCommImage(child.images)"
+                  v-if="child.images && child.images.length > 0"
+                  >查看图片</el-link
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -58,42 +68,54 @@
 
 <script>
 import { ImagePreview } from "vant";
+
 export default {
   name: "Commnet",
-  props: ["info"],
+  props: ["comm", "childComm"],
   data() {
     return {
       actionSheetVisible: false,
       actions: [{ name: "回复" }, { name: "复制" }, { name: "分享" }],
-      subReplyUser: "",
+      replyChildInfo: {},
     };
   },
 
   methods: {
     showAcitonSheet() {
       this.actionSheetVisible = true;
+      this.replyChildInfo = {};
     },
-    showSubAcitonSheet(name) {
+    showSubAcitonSheet(child) {
       this.actionSheetVisible = true;
-      this.subReplyUser = name;
+      this.replyChildInfo = {
+        commId: child.commId,
+        userName: child.userName,
+        parentId: child.parentId,
+      };
     },
     acitonSheetOnSelect(item) {
       if (item.name == "回复") {
-        if (this.subReplyUser.length != "") {
-          this.$toast.success(this.subReplyUser);
-          this.replyTo(this.subReplyUser);
+        // 回复评论
+        if (this.replyChildInfo.commId == undefined) {
+          this.$emit("replyToComm", {
+            userName: this.comm.userName,
+            commId: this.comm.commId,
+            parentId: 0,
+          });
         } else {
-          this.replyTo(this.info.user);
+          // 回复子评论
+          this.$emit("replyToComm", this.replyChildInfo);
         }
       }
       this.actionSheetVisible = false;
     },
-    replyTo(name) {
-      this.$emit("replyUserName", name);
-    },
-    actionSheetOnCancel() {},
     viewImage() {
-      ImagePreview(this.info.images);
+      ImagePreview(this.comm.images);
+      event.stopPropagation();
+    },
+    viewChilCommImage(images) {
+      ImagePreview(images);
+      event.stopPropagation();
     },
   },
 };

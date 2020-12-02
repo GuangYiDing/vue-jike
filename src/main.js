@@ -12,8 +12,9 @@ import store from './store/index';
 // import { Loading } from 'element-ui';
 // import { Message } from 'element-ui';
 import { Button } from 'element-ui';
+import { Link } from "element-ui";
 Vue.use(Button);
-
+Vue.use(Link);
 import { Tabbar, TabbarItem } from 'vant';
 import { Icon } from 'vant';
 import { List } from 'vant';
@@ -53,7 +54,6 @@ Vue.use(ActionSheet);
 Vue.use(Sticky);
 Vue.use(PasswordInput);
 Vue.use(NumberKeyboard);
-Vue.use(ImagePreview);
 Vue.use(Loading);
 Vue.use(Swipe);
 Vue.use(SwipeItem);

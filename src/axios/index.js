@@ -8,12 +8,12 @@ axios.defaults.timeout = 15000
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 axios.defaults.headers.get['Content-Type'] = 'application/json;charset=UTF-8';
 axios.defaults.baseURL = '/'
-
+axios.defaults.headers.post['Authorization'] = store.state.token;
 
 /* 请求拦截器（请求之前的操作） */
 axios.interceptors.request.use((req) => {
     if (store.state.token != "") {
-        req.headers.Authorization = store.state.token
+        // req.headers.Authorization = store.state.token
     }
     console.log(req)
     return req;

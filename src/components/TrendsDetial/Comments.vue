@@ -1,109 +1,53 @@
 <template>
   <div class="Comments">
-    <div class="Hot-Comments" v-show="hotList.length != 0">
+    <!-- <div class="Hot-Comments" v-show="this.comments.length != 0">
       <h3>热门评论</h3>
-      <Comment :info="info" @replyUserName="replyTo" />
-    </div>
+      <Comment />
+    </div> -->
     <div class="Latest-Comments">
       <h3>最新评论</h3>
-      <Comment :info="comm" v-for="comm in commList" :key="comm.commId" />
-      <van-divider v-show="commList.length == 0">暂无评论😪</van-divider>
+      <Comment
+        :comm="comm"
+        v-for="comm in this.noParentComm"
+        :key="comm.commId"
+        :childComm="hasParentComm"
+        @replyToComm="replyTo"
+      />
+      <van-divider v-show="this.noParentComm.length == 0"
+        >暂无评论😪</van-divider
+      >
     </div>
   </div>
 </template>
 
 <script>
 import Comment from "./Comment";
-import Iurl from "../../axios/constants";
 export default {
   name: "Comments",
   components: {
     Comment,
   },
+  props: ["comments", "hasParentComm", "noParentComm"],
   data() {
-    return {
-      info: {
-        avatar: "https://img.yzcdn.cn/vant/cat.jpeg",
-        user: "马老师",
-        time: "2天前",
-        like: 12,
-        content: "年轻人不讲武德",
-        hasReply: true,
-        replys: [
-          {
-            user: "Max丶海贼1号",
-            content:
-              "就这?就这?就这?就这?就这?就这?就这?就这?就这?就这?就这?就这?就这?",
-          },
-          {
-            user: "Max丶海贼2号",
-            content: "就这?",
-          },
-        ],
-      },
-      info2: {
-        avatar: "https://img.yzcdn.cn/vant/cat.jpeg",
-        user: "马老师",
-        time: "2天前",
-        like: 12,
-        content: "年轻人不讲武德",
-        hasReply: false,
-        replys: [
-          {
-            user: "Max丶海贼",
-            content: "就这?",
-          },
-          {
-            user: "Max丶海贼",
-            content: "就这?",
-          },
-        ],
-      },
-      commList: [],
-      hotList: [],
-    };
+    return {};
   },
-  computed: {
-    noParentComm: function () {
-      return this.data.list.filter(function (item) {
-        return item.pid == 0;
-      });
-    },
-    hasParentComm: function () {
-      return this.data.list
-        .filter(function (item) {
-          return item.pid != 0;
-        })
-        .reverse();
-    },
-  },
-  mounted() {
-    this.getComm();
-  },
+  // computed: {
+  //   noParentComm() {
+  //     return this.comments.filter(function (item) {
+  //       return item.parentId == 0;
+  //     });
+  //   },
+  //   hasParentComm() {
+  //     return this.comments
+  //       .filter(function (item) {
+  //         return item.parentId != 0;
+  //       })
+  //       .reverse();
+  //   },
+  // },
   methods: {
-    replyTo(name) {
-      this.$emit("replyUserName", name);
-    },
-    getComm() {
-      this.axios
-        .get("/jike-api/comm", {
-          params: { trendId: this.$route.params.id },
-        })
-        .then((resp) => {
-          this.commList = resp.data.data.map((item) => {
-            let imagesArr = item.images.split(",");
-            let perviewArr = imagesArr.map((i) => {
-              return (i = Iurl.perview + i);
-            });
-            item.images = perviewArr;
-            item.userAvatar = Iurl.perview + item.userAvatar;
-            item.zoneAvatar = Iurl.perview + item.zoneAvatar;
-            return item;
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    replyTo(user) {
+      this.$emit("replyToUser", user);
     },
   },
 };

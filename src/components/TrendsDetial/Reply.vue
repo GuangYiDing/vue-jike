@@ -3,11 +3,12 @@
     <div class="inputline">
       <div class="textarea_wrapper">
         <van-field
+          ref="replyInput"
           v-model="content"
           rows="1"
           autosize
           type="textarea"
-          :placeholder="replyPlaceHolder"
+          :placeholder="replyTo"
           @focus="fixedKeyborad"
         />
       </div>
@@ -48,7 +49,6 @@
       v-show="emojiVisible"
       :visible="emojiVisible"
     />
-
     <van-uploader
       v-if="uploaderVisible"
       v-model="uploads"
@@ -61,34 +61,29 @@
 
 <script>
 import Emoji from "../Post/Emoji.vue";
-// import qs from "qs";
 export default {
   name: "Reply",
   components: {
     Emoji,
   },
-  inject: ["reload"],
+  props: ["replyToUserName"],
   data() {
     return {
       uploads: [],
       content: "",
-      replyTo: 0,
-      uid: 0,
-      time: 0,
       emojiVisible: false,
       uploaderVisible: false,
-      imgPreview: "",
     };
   },
   computed: {
-    replyPlaceHolder() {
-      let userName;
-      this.$store.state.recommendList.forEach((element) => {
-        if (element.trendId == this.$route.params.id) {
-          userName = element.userName;
-        }
-      });
-      return "回复" + userName + ":";
+    replyTo() {
+      return "回复 " + this.replyToUserName + " :";
+    },
+  },
+  watch: {
+    replyToUserName() {
+      this.content = "";
+      this.$refs.replyInput.focus();
     },
   },
   methods: {
@@ -137,27 +132,20 @@ export default {
     },
     postComm() {
       if (this.loginCheck() && this.contentCheck()) {
-        let uploadsStr = this.uploads
-          .map((item) => {
-            return (item = item.url.split("/master")[1]);
-          })
-          .toString();
-        this.axios
-          .post(
-            "/jike-api/comm",
-            JSON.stringify({
-              trendId: this.$route.params.id,
-              content: this.content,
-              images: uploadsStr,
+        let uploadsStr;
+        if (this.uploads.length > 0) {
+          uploadsStr = this.uploads
+            .map((item) => {
+              return (item = item.url.split("/master")[1]);
             })
-          )
-          .then((resp) => {
-            this.$toast.success(resp.data);
-            this.reload();
-          })
-          .catch((err) => {
-            this.$toast.fail(err);
-          });
+            .toString();
+        } else {
+          uploadsStr = null;
+        }
+        this.$emit("readyToRely", {
+          content: this.content,
+          images: uploadsStr,
+        });
       }
     },
   },
@@ -205,5 +193,4 @@ export default {
   top: 9%;
   right: -22%;
 }
-
 </style>

@@ -85,6 +85,7 @@ export default {
     },
     viewImage() {
       ImagePreview(this.info.images);
+      event.stopPropagation();
     },
   },
 };

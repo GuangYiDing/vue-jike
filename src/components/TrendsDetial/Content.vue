@@ -6,38 +6,42 @@
           round
           width="40px"
           height="40px"
-          :src="this.info.userAvatar"
-        />
+          :src="this.content.userAvatar"
+        >
+          <template v-slot:loading> <van-loading /> </template
+        ></van-image>
       </div>
       <div class="userInfo">
-        {{ this.info.userName }}
-        <span>{{ info.signature }}</span>
+        {{ this.content.userName }}
+        <span>{{ content.signature }}</span>
       </div>
       <div class="follow fr">
         <el-button size="small" round type="primary">关注</el-button>
       </div>
     </header>
-    <div class="desc">{{ this.info.content }}</div>
+    <div class="desc">{{ this.content.content }}</div>
     <div class="images">
       <van-image
         :src="image"
         @click="viewImage"
-        v-for="image in info.images"
+        v-for="image in content.images"
         :key="image"
         width="80"
       ></van-image>
     </div>
     <div class="time">
-      <span> {{ info.createTime }} </span>
+      <span> {{ content.createTime }} </span>
     </div>
     <div class="zone">
       <div class="zone-img">
-        <van-image width="40" height="40" :src="info.zoneAvatar" />
+        <van-image width="40" height="40" :src="content.zoneAvatar">
+          <template v-slot:loading> <van-loading /> </template
+        ></van-image>
       </div>
       <div class="middle">
-        <div class="zone-title">{{ info.zoneName }}</div>
+        <div class="zone-title">{{ content.zoneName }}</div>
         <div class="zone-title-desc van-ellipsis">
-          {{ info.description }}
+          {{ content.description }}
         </div>
       </div>
       <div class="join fr">
@@ -48,13 +52,13 @@
       <div class="like">
         <van-icon name="like-o" />
         <span>
-          {{ info.likesCount }}
+          {{ content.likesCount }}
         </span>
       </div>
-      <div class="comment-count">
+      <div class="comment-count" @click="replyTrend">
         <van-icon name="comment-o" />
         <span>
-          {{ info.commentsCount }}
+          {{ content.commentsCount }}
         </span>
       </div>
     </footer>
@@ -65,31 +69,20 @@
 import { ImagePreview } from "vant";
 export default {
   name: "Content",
+  props: ["content"],
   data() {
-    return {
-      info: {},
-    };
+    return {};
   },
-  mounted() {
-    this.loadDetail();
-  },
-  created() {},
   methods: {
-    loadDetail() {
-      if (this.$store.state.recommendList.length > 0) {
-        this.$store.state.recommendList.forEach((element) => {
-          if (this.$route.params.id == element.trendId) {
-            this.info = element;
-            this.info.description =
-              element.description.length > 15
-                ? element.description.slice(0, 12) + "..."
-                : element.description;
-          }
-        });
-      }
-    },
     viewImage() {
-      ImagePreview(this.info.images);
+      ImagePreview(this.content.images);
+    },
+    replyTrend() {
+      this.$emit("replyTrend", {
+        replyTrend: true,
+        userName: this.content.userName,
+      });
+      this.$toast("回复" + this.content.userName + "的动态");
     },
   },
 };
@@ -117,7 +110,7 @@ export default {
   position: relative;
   font-size: 12px;
   color: #9e9e9e;
-  left: -25%;
+  left: -34%;
   top: 20px;
 }
 .Content .desc {
@@ -162,5 +155,8 @@ export default {
 }
 .images {
   padding: 12px;
+}
+.van-image img {
+  border-radius: 5px;
 }
 </style>

@@ -46,7 +46,12 @@
               successText="验证通过"
               handlerIcon="van-icon van-icon-arrow"
               successIcon="van-icon van-icon-success"
-              @passcallback="loginVerify = true"
+              @passcallback="
+                () => {
+                  loginVerify = true;
+                  this.$toast.success('通过验证');
+                }
+              "
             />
           </div>
           <div class="button">
@@ -94,7 +99,12 @@
               successIcon="van-icon van-icon-success"
               text="请按动滑动拖动"
               :showRefresh="this.showRefresh"
-              @passcallback="signupVerify = true"
+              @passcallback="
+                () => {
+                  signupVerify = true;
+                  this.$toast.success('通过验证');
+                }
+              "
               @refresh="this.imgChipRefresh"
             >
             </drag-verify-img-chip>

@@ -108,11 +108,19 @@ export default {
           images.push(item.url.split("/master")[1]);
         });
         this.axios
-          .post("/jike-api/trend", {
-            images: images,
-            content: this.message,
-            zone: this.zone,
-          })
+          .post(
+            "/jike-api/trend",
+            {
+              images: images,
+              content: this.message,
+              zone: this.zone,
+            }
+            // {
+            //   headers: {
+            //     Authorization: this.$store.state.token,
+            //   },
+            // }
+          )
           .then((resp) => {
             this.$toast.clear();
             this.$toast.success(resp.data);
