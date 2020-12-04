@@ -24,7 +24,9 @@
           <span>{{ comm.createTime }}</span>
         </div>
         <div class="like fr">
-          <van-icon name="like-o" /> <span>{{ comm.likesCount }}</span>
+          <van-icon name="like" v-if="isLiked" color="red" />
+          <van-icon name="like-o" v-if="!isLiked" @click="ilikeit" />
+          <span>{{ comm.likesCount }}</span>
         </div>
       </div>
       <div class="content" @click="showAcitonSheet()">
@@ -71,7 +73,8 @@ import { ImagePreview } from "vant";
 
 export default {
   name: "Commnet",
-  props: ["comm", "childComm"],
+  props: ["comm", "childComm", "likedComm"],
+  inject: ["reload"],
   data() {
     return {
       actionSheetVisible: false,
@@ -79,7 +82,14 @@ export default {
       replyChildInfo: {},
     };
   },
-
+  computed: {
+    isLiked() {
+      for (var value of this.likedComm) {
+        if (value.commentId == this.comm.commId) return true;
+      }
+      return false;
+    },
+  },
   methods: {
     showAcitonSheet() {
       this.actionSheetVisible = true;
@@ -116,6 +126,54 @@ export default {
     viewChilCommImage(images) {
       ImagePreview(images);
       event.stopPropagation();
+    },
+    loginCheck() {
+      if (this.$store.state.token == null) {
+        this.$dialog
+          .confirm({
+            title: "哦吼",
+            message: "还没登录?来登录一起搞事吧😎~",
+            confirmButtonText: "去登录",
+            cancelButtonText: "我才不",
+          })
+          .then(() => {
+            this.$router.push("/Login");
+          })
+          .catch(() => {
+            return false;
+          });
+        return false;
+      }
+      return true;
+    },
+    ilikeit() {
+      event.stopPropagation();
+      if (this.loginCheck()) {
+        this.axios
+          .post(
+            "/jike-api/like/comm",
+            JSON.stringify({
+              commId: this.comm.commId,
+            }),
+            {
+              headers: {
+                Authorization: this.$store.state.token,
+              },
+            }
+          )
+          .then((resp) => {
+            if (resp.data.code == 200) {
+              this.$toast({
+                icon: "like-o",
+                message: "好家伙",
+              });
+              this.$emit("reloadComm");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     },
   },
 };

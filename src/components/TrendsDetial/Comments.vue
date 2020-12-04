@@ -11,7 +11,9 @@
         v-for="comm in this.noParentComm"
         :key="comm.commId"
         :childComm="hasParentComm"
+        :likedComm="likedComm"
         @replyToComm="replyTo"
+        @reloadComm="reloadComm"
       />
       <van-divider v-show="this.noParentComm.length == 0"
         >暂无评论😪</van-divider
@@ -28,26 +30,35 @@ export default {
     Comment,
   },
   props: ["comments", "hasParentComm", "noParentComm"],
+  inject: ["reload"],
   data() {
-    return {};
+    return {
+      likedComm: [],
+    };
   },
-  // computed: {
-  //   noParentComm() {
-  //     return this.comments.filter(function (item) {
-  //       return item.parentId == 0;
-  //     });
-  //   },
-  //   hasParentComm() {
-  //     return this.comments
-  //       .filter(function (item) {
-  //         return item.parentId != 0;
-  //       })
-  //       .reverse();
-  //   },
-  // },
+  mounted() {
+    this.getLikedComm();
+  },
   methods: {
     replyTo(user) {
       this.$emit("replyToUser", user);
+    },
+    getLikedComm() {
+      if (this.$store.state.token != null) {
+        this.axios
+          .get("/jike-api/like/comm", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            this.likedComm = resp.data.data;
+          });
+      }
+    },
+    reloadComm() {
+      this.$emit("reloadComm");
+      this.getLikedComm();
     },
   },
 };

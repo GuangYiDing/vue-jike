@@ -9,11 +9,17 @@
       />
     </div>
     <div class="mid">
-      <Content :content="detailContent" @replyTrend="replyTo" />
+      <Content
+        :content="detailContent"
+        @replyTrend="replyTo"
+        :likedTrend="likedTrend"
+        @reloadContent="reloadContent"
+      />
       <Comments
         @replyToUser="replyTo"
         :noParentComm="noParentComm"
         :hasParentComm="hasParentComm"
+        @reloadComm="reloadComm"
       />
     </div>
     <div class="bot">
@@ -42,11 +48,17 @@ export default {
       hasParentComm: [],
       replyUserInfo: {},
       replyPlaceHolder: "",
+      likedTrend: [],
     };
   },
   mounted() {
     this.loadContent();
     this.loadComments();
+    this.getLikedTrend();
+    // this.axios.all([this.loadContent(), this.getLikedTrend()]).then(
+    //   this.axios.spread((resp1, resp2) => {
+    //   })
+    // );
   },
   methods: {
     onClickLeft() {
@@ -74,6 +86,7 @@ export default {
               : item.description;
           // 回复框占位符默认动态主名
           this.replyPlaceHolder = this.detailContent.userName;
+          this.getLikedTrend();
         });
     },
     async loadComments() {
@@ -97,9 +110,11 @@ export default {
           this.noParentComm = detailComments.filter(function (item) {
             return item.parentId == 0;
           });
-          this.hasParentComm = detailComments.filter(function (item) {
-            return item.parentId != 0;
-          });
+          this.hasParentComm = detailComments
+            .filter(function (item) {
+              return item.parentId != 0;
+            })
+            .reverse();
         })
         .catch((err) => {
           console.log(err);
@@ -118,38 +133,54 @@ export default {
     },
     postReply(replyContentPayload) {
       // 判断回复的是动态还是评论还是子评论,如果为子评论需要将父节点修改为子评论的父节点
-      // let parentId = 0;
-      // if (this.replyUserInfo.commId == undefined) {
-      //   parentId = 0;
-      // }
-      // if (this.replyUserInfo.parentId == 0) {
-      //   parentId = this.replyUserInfo.commId;
-      // } else {
-      //   parentId = this.replyUserInfo.parentId;
-      // }
       this.axios
         .post(
           "/jike-api/comm",
-          JSON.stringify({
-            trendId: this.$route.params.id,
-            content: replyContentPayload.content,
-            images: replyContentPayload.images,
-            parentId:
-              this.replyUserInfo.commId == undefined
-                ? 0
-                : this.replyUserInfo.parentId == 0
-                ? this.replyUserInfo.commId
-                : this.replyUserInfo.parentId,
-          })
+          JSON.stringify(
+            {
+              trendId: this.$route.params.id,
+              content: replyContentPayload.content,
+              images: replyContentPayload.images,
+              parentId:
+                this.replyUserInfo.commId == undefined
+                  ? 0
+                  : this.replyUserInfo.parentId == 0
+                  ? this.replyUserInfo.commId
+                  : this.replyUserInfo.parentId,
+            },
+            {
+              headers: {
+                Authorization: this.$store.state.token,
+              },
+            }
+          )
         )
         .then((resp) => {
           this.$toast.success(resp.data);
           this.reload();
         })
         .catch((err) => {
-          this.$toast.fail(err);
-          this.reload();
+          this.$toast.fail(err.response.data.message);
         });
+    },
+    getLikedTrend() {
+      if (this.$store.state.token != null) {
+        this.axios
+          .get("/jike-api/like/trend", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            this.likedTrend = resp.data.data;
+          });
+      }
+    },
+    reloadComm() {
+      this.loadComments();
+    },
+    reloadContent() {
+      this.loadContent();
     },
   },
 };

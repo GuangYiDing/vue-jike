@@ -3,7 +3,7 @@
     <div class="top">
       <div class="one-line">
         <div class="avatar">
-          <van-image :src="avatar" width="60" height="60" round>
+          <van-image :src="userInfo.userAvatar" width="60" height="60" round>
             <template v-slot:loading>
               <van-loading />
             </template>
@@ -27,9 +27,11 @@
         </div>
       </div>
 
-      <div class="nike">{{ nike }}</div>
+      <div class="nike">{{ userInfo.userName }}</div>
+      <div class="signature">{{ userInfo.signature }}</div>
       <div class="follow">
-        {{ following }} <span> 关注 </span> | {{ followed }} <span>被关注</span>
+        {{ userInfo.following }} <span> 关注 </span> | {{ userInfo.followed }}
+        <span>被关注</span>
       </div>
     </div>
     <div class="bottom"></div>
@@ -37,19 +39,18 @@
 </template>
 
 <script>
+import Iurl from "../../axios/constants";
 export default {
   name: "Profile",
   data() {
     return {
-      nike: "Max丶海贼",
-      avatar:
-        "https://gitee.com/xiaodingsiren/JikePic/raw/master/alu/不出所料.png",
-      following: 8,
-      followed: 1,
-      female: 0,
       showPopover: false,
       actions: [{ text: "注销" }],
+      userInfo: {},
     };
+  },
+  mounted() {
+    this.getUserInfo();
   },
   methods: {
     scaleBackground() {
@@ -58,16 +59,34 @@ export default {
     onSelect(action) {
       if (action.text == "注销") {
         this.axios
-          .get("/jike-api/users/logout")
+          .get("/jike-api/users/logout", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
           .then(() => {
             this.$toast.success("注销成功");
-            this.$store.commit("setToken", "");
+            this.$store.commit("setToken", null);
             this.$router.push("/");
+            location.reload();
           })
           .catch((err) => {
             this.$toast.fail(err.message);
           });
       }
+    },
+    getUserInfo() {
+      this.axios
+        .get("/jike-api/users/info", {
+          headers: {
+            Authorization: this.$store.state.token,
+          },
+        })
+        .then((resp) => {
+          console.log(resp.data.data);
+          this.userInfo = resp.data.data;
+          this.userInfo.userAvatar = Iurl.perview + resp.data.data.avatar;
+        });
     },
   },
 };
@@ -110,5 +129,9 @@ export default {
   position: relative;
   top: 20%;
   background-color: aliceblue;
+}
+.Profile .signature {
+  color: #8e8e8e8e;
+  font-size: 14px;
 }
 </style>

@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
-        token: "",
+        token: null,
         emojiList: { acList: [], aluList: [] },
         recommendList: []
     },

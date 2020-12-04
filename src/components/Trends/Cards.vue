@@ -1,13 +1,23 @@
 <template>
   <div class="Cards">
-    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+    <van-pull-refresh
+      v-model="isLoading"
+      @refresh="onRefresh"
+      success-text="刷新成功"
+    >
       <van-list
         v-model="loading"
         :finished="finished"
         finished-text="没有更多了"
         @load="onLoad"
       >
-        <card v-for="item in list" :key="item.cardId" :info="item" />
+        <card
+          v-for="item in list"
+          :key="item.cardId"
+          :info="item"
+          :likedTrend="likedTrend"
+          @reloadTrend="reloadTrend"
+        />
       </van-list>
     </van-pull-refresh>
   </div>
@@ -18,6 +28,7 @@ import Iurl from "../../axios/constants";
 import Card from "./Card";
 export default {
   name: "Cards",
+  inject: ["reload"],
   components: {
     Card,
   },
@@ -28,6 +39,7 @@ export default {
       finished: false,
       count: 0,
       isLoading: false,
+      likedTrend: [],
     };
   },
   methods: {
@@ -36,6 +48,28 @@ export default {
         message: "加载中...",
         forbidClick: true,
       });
+      this.loadTrend();
+      this.getLikedTrend();
+    },
+    async onRefresh() {
+      await this.loadTrend();
+      this.getLikedTrend();
+      this.isLoading = false;
+    },
+    getLikedTrend() {
+      if (this.$store.state.token != null) {
+        this.axios
+          .get("/jike-api/like/trend", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            this.likedTrend = resp.data.data;
+          });
+      }
+    },
+    loadTrend() {
       this.axios.get("/jike-api/trend/recommend").then((resp) => {
         const list = resp.data.data;
         list.filter((item) => {
@@ -54,11 +88,13 @@ export default {
         this.finished = true;
       });
     },
-    onRefresh() {
-      setTimeout(() => {
-        this.$toast("刷新成功");
-        this.isLoading = false;
-      }, 1000);
+    reloadTrend() {
+      this.$toast({
+        icon: "like-o",
+        message: "好家伙",
+      });
+      this.loadTrend();
+      this.getLikedTrend();
     },
   },
 };

@@ -9,8 +9,8 @@
       <van-tabbar-item replace to="/messages" icon="chat-o" badge="99+"
         >通知</van-tabbar-item
       >
-      <van-tabbar-item replace @click="checkLogin" icon="user-circle-o"
-        >我的</van-tabbar-item
+      <van-tabbar-item replace icon="user-circle-o" @click="checkLogin">
+        我的</van-tabbar-item
       >
     </van-tabbar>
   </div>
@@ -27,8 +27,21 @@ export default {
   },
   methods: {
     checkLogin() {
-      if (this.$store.state.token == "") {
-        this.$router.push("/Login");
+      if (this.$store.state.token == null) {
+        this.$dialog
+          .confirm({
+            title: "哦吼",
+            message: "还没登录?来登录一起搞事吧😎~",
+            confirmButtonText: "去登录",
+            cancelButtonText: "我才不",
+          })
+          .then(() => {
+            this.$router.push("/Login");
+          })
+          .catch(() => {
+            return false;
+          });
+        return false;
       } else {
         this.$router.push("/Mine");
       }

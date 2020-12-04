@@ -114,16 +114,17 @@ export default {
               images: images,
               content: this.message,
               zone: this.zone,
+            },
+            {
+              headers: {
+                Authorization: this.$store.state.token,
+              },
             }
-            // {
-            //   headers: {
-            //     Authorization: this.$store.state.token,
-            //   },
-            // }
           )
           .then((resp) => {
             this.$toast.clear();
             this.$toast.success(resp.data);
+            this.$router.push("/");
           })
           .catch((error) => {
             this.$toast.fail(error);
@@ -135,7 +136,7 @@ export default {
         this.$dialog
           .confirm({
             title: "哦吼",
-            message: "还没登录?来登录一起发布吧😎~",
+            message: "还没登录?来登录一起搞事吧😎~",
             confirmButtonText: "去登录",
             cancelButtonText: "我才不",
           })

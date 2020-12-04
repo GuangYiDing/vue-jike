@@ -8,13 +8,7 @@
       <span>{{ info.desc }}</span>
     </div>
     <div class="imgList">
-      <van-image
-        v-for="item in info.imgList"
-        :key="item.src"
-        width="50px"
-        height="50px"
-        :src="item.src"
-      />
+      <van-image v-for="item in 3" :key="item" width="50px" height="50px" />
     </div>
     <el-button round type="primary" id="followBtn">关注TA</el-button>
   </div>

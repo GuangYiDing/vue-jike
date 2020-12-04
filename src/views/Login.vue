@@ -191,13 +191,20 @@ export default {
             }
           )
           .then((resp) => {
-            this.$toast.success("登录成功~");
-            console.log(resp);
-            this.$store.commit("setToken", resp.data.data);
-            this.$router.push("/");
+            if (resp.data.code == 200) {
+              this.$toast.success("登录成功~");
+              console.log(resp);
+              this.$store.commit("setToken", resp.data.data);
+              this.$router.push("/");
+              location.reload();
+            } else {
+              this.$toast.fail(resp.data.message);
+              this.loginVerify = false;
+              this.$refs.dragVerify.reset();
+            }
           })
           .catch((error) => {
-            this.$toast.fail(error.message);
+            this.$toast.fail(error.response.data.message);
           });
       }
     },
@@ -240,11 +247,17 @@ export default {
               },
             }
           )
-          .then(() => {
-            this.$toast.success("成功注册可以登录啦~");
-            this.loginUserName = this.signupUserName;
-            this.loginPassWord = this.signupPassWord;
-            this.active = 0;
+          .then((resp) => {
+            if (resp.data.code == 200) {
+              this.$toast.success("成功注册可以登录啦~");
+              this.loginUserName = this.signupUserName;
+              this.loginPassWord = this.signupPassWord;
+              this.active = 0;
+            } else {
+              this.$toast.fail(resp.data.message);
+              this.signupVerify = false;
+              this.$refs.dragImgVerify.reset();
+            }
           })
           .catch((error) => {
             this.$toast.fail(error.message);

@@ -50,7 +50,8 @@
     </div>
     <footer>
       <div class="like">
-        <van-icon name="like-o" />
+        <van-icon name="like" v-if="isLiked" color="red" />
+        <van-icon name="like-o" v-if="!isLiked" @click="ilikeit" />
         <span>
           {{ content.likesCount }}
         </span>
@@ -69,9 +70,17 @@
 import { ImagePreview } from "vant";
 export default {
   name: "Content",
-  props: ["content"],
+  props: ["content", "likedTrend"],
   data() {
     return {};
+  },
+  computed: {
+    isLiked() {
+      for (var value of this.likedTrend) {
+        if (value.trendId == this.content.trendId) return true;
+      }
+      return false;
+    },
   },
   methods: {
     viewImage() {
@@ -83,6 +92,51 @@ export default {
         userName: this.content.userName,
       });
       this.$toast("回复" + this.content.userName + "的动态");
+    },
+    loginCheck() {
+      if (this.$store.state.token == null) {
+        this.$dialog
+          .confirm({
+            title: "哦吼",
+            message: "还没登录?来登录一起搞事吧😎~",
+            confirmButtonText: "去登录",
+            cancelButtonText: "我才不",
+          })
+          .then(() => {
+            this.$router.push("/Login");
+          })
+          .catch(() => {
+            return false;
+          });
+        return false;
+      }
+      return true;
+    },
+    ilikeit() {
+      if (this.loginCheck()) {
+        this.axios
+          .post(
+            "/jike-api/like/trend",
+            JSON.stringify({ trendId: this.content.trendId }),
+            {
+              headers: {
+                Authorization: this.$store.state.token,
+              },
+            }
+          )
+          .then((resp) => {
+            if (resp.data.code == 200) {
+              this.$toast({
+                icon: "like-o",
+                message: "好家伙",
+              });
+              this.$emit("reloadContent");
+            }
+          })
+          .catch((err) => {
+            this.$toast.fail(err.response.data.message);
+          });
+      }
     },
   },
 };

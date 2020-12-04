@@ -49,7 +49,8 @@
     </div>
     <footer>
       <div class="like">
-        <van-icon name="like-o" />
+        <van-icon name="like" v-if="isLiked" color="red" />
+        <van-icon name="like-o" v-if="!isLiked" @click="ilikeit" />
         <span>
           {{ info.likesCount }}
         </span>
@@ -68,13 +69,20 @@
 import { ImagePreview } from "vant";
 export default {
   name: "Card",
-  props: ["info"],
+  props: ["info", "likedTrend"],
+  inject: ["reload"],
   data() {
     return {};
   },
   computed: {
     images: () => {
       this.info.images;
+    },
+    isLiked() {
+      for (var value of this.likedTrend) {
+        if (value.trendId == this.info.trendId) return true;
+      }
+      return false;
     },
   },
   methods: {
@@ -86,6 +94,48 @@ export default {
     viewImage() {
       ImagePreview(this.info.images);
       event.stopPropagation();
+    },
+    loginCheck() {
+      if (this.$store.state.token == null) {
+        this.$dialog
+          .confirm({
+            title: "哦吼",
+            message: "还没登录?来登录一起搞事吧😎~",
+            confirmButtonText: "去登录",
+            cancelButtonText: "我才不",
+          })
+          .then(() => {
+            this.$router.push("/Login");
+          })
+          .catch(() => {
+            return false;
+          });
+        return false;
+      }
+      return true;
+    },
+    ilikeit() {
+      event.stopPropagation();
+      if (this.loginCheck()) {
+        this.axios
+          .post(
+            "/jike-api/like/trend",
+            JSON.stringify({ trendId: this.info.trendId }),
+            {
+              headers: {
+                Authorization: this.$store.state.token,
+              },
+            }
+          )
+          .then((resp) => {
+            if (resp.data.code == 200) {
+              this.$emit("reloadTrend");
+            }
+          })
+          .catch((err) => {
+            this.$toast.fail(err.response.data.message);
+          });
+      }
     },
   },
 };

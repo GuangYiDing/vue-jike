@@ -9,13 +9,13 @@ const routes = [
         path: '/',
         name: 'Trends',
         component: () => import('../views/Trends.vue'),
-        meta: { title: "推荐", keepAlive: true, }
+        meta: { title: "推荐" }
     },
     {
         path: '/Friends',
         name: 'Friends',
         component: () => import('../views/Friends.vue'),
-        meta: { title: "动态", keepAlive: true, }
+        meta: { title: "朋友" }
     },
     {
         path: '/Post',
