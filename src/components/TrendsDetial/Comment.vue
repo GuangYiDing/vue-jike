@@ -6,7 +6,7 @@
       @select="acitonSheetOnSelect"
       cancel-text="取消"
     />
-    <div class="left">
+    <div class="left" @click="showAcitonSheet()">
       <van-image
         round
         class="avatar"
@@ -17,10 +17,10 @@
         <template v-slot:loading> <van-loading /> </template
       ></van-image>
     </div>
-    <div class="right">
+    <div class="right" @click="showAcitonSheet()">
       <div class="header">
         <div class="middle">
-          <div class="userName">{{ comm.userName }}</div>
+          <div class="userName" @click="goUserInfo">{{ comm.userName }}</div>
           <span>{{ comm.createTime }}</span>
         </div>
         <div class="like fr">
@@ -29,7 +29,7 @@
           <span>{{ comm.likesCount }}</span>
         </div>
       </div>
-      <div class="content" @click="showAcitonSheet()">
+      <div class="content">
         {{ comm.content }}
         <div class="content-images">
           <van-image
@@ -37,7 +37,6 @@
             @click="viewImage"
             v-for="image in comm.images"
             :key="image"
-            width="80"
           >
             <template v-slot:loading>
               <van-loading type="spinner" size="20" />
@@ -175,6 +174,15 @@ export default {
           });
       }
     },
+    goUserInfo() {
+      if (this.$router.name != "Others") {
+        var userId = this.comm.userId;
+        this.$router.push({
+          path: `/Others/${userId}`,
+        });
+      }
+      event.stopPropagation();
+    },
   },
 };
 </script>
@@ -229,5 +237,11 @@ export default {
   text-align: center;
   line-height: 22px;
   height: 22px;
+}
+.Comment .right .like span {
+  font-size: 16px;
+}
+.Comment .right .like i {
+  margin-right: 2px;
 }
 </style>

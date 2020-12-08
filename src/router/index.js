@@ -36,6 +36,12 @@ const routes = [
         meta: { title: "我的" }
     },
     {
+        path: '/Others/:userId',
+        name: 'Others',
+        component: () => import('../views/Mine.vue'),
+        meta: { title: "名片" }
+    },
+    {
         path: '/TrendsDetial/:id',
         name: 'TrendsDetial',
         component: () => import('../views/TrendsDetial.vue'),
@@ -46,6 +52,12 @@ const routes = [
         name: 'Login',
         component: () => import('../views/Login.vue'),
         meta: { title: "登录/注册" }
+    },
+    {
+        path: '/Personal',
+        name: 'Personal',
+        component: () => import('../components/Mine/Personal.vue'),
+        meta: { title: "编辑个人信息" }
     }
 ]
 

@@ -55,12 +55,14 @@
       max-count="8"
       max-size="1024*1024"
       multiple
+      @oversize="onOversize"
     ></van-uploader>
   </div>
 </template>
 
 <script>
 import Emoji from "../Post/Emoji.vue";
+import Iurl from "../../axios/constants";
 export default {
   name: "Reply",
   components: {
@@ -83,7 +85,6 @@ export default {
   watch: {
     replyToUserName() {
       this.content = "";
-      this.$refs.replyInput.focus();
     },
   },
   methods: {
@@ -118,8 +119,9 @@ export default {
             return false;
           });
         return false;
+      } else {
+        return true;
       }
-      return true;
     },
     contentCheck() {
       if (this.content != "") {
@@ -128,12 +130,49 @@ export default {
       if (this.uploads.length > 0) {
         return true;
       }
+      this.$toast("简单说两句");
       return false;
     },
-    postComm() {
+    onOversize() {
+      this.$toast("文件大小不能超过 1M");
+    },
+    async base64toURl(file) {
+      let fileName = file.file.name;
+      let path = "/images/";
+      let realContent = file.content.split(",")[1];
+      let random = Math.floor(Math.random() * realContent.length);
+      let uploadName =
+        path + realContent.substring(random, random + 5) + fileName;
+      let postUrl = "/gitee" + uploadName;
+      this.$toast.loading({
+        message: "上传中...",
+        forbidClick: true,
+        duration: 0,
+      });
+      await this.axios
+        .post(postUrl, {
+          access_token: Iurl.access_token,
+          message: Iurl.message,
+          content: realContent,
+        })
+        .then(() => {
+          file.url = Iurl.perview + uploadName;
+        })
+        .catch((error) => {
+          this.$toast.fail(error);
+        });
+    },
+    async postComm() {
+      console.log(this.loginCheck() && this.contentCheck());
       if (this.loginCheck() && this.contentCheck()) {
         let uploadsStr;
         if (this.uploads.length > 0) {
+          var arr = this.uploads;
+          for (let i = 0, len = arr.length; i < len; i++) {
+            if (arr[i].url == undefined) {
+              await this.base64toURl(arr[i]);
+            }
+          }
           uploadsStr = this.uploads
             .map((item) => {
               return (item = item.url.split("/master")[1]);

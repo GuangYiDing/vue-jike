@@ -11,10 +11,12 @@ import store from './store/index';
 
 // import { Loading } from 'element-ui';
 // import { Message } from 'element-ui';
+// Vue.use(Message);
 import { Button } from 'element-ui';
 import { Link } from "element-ui";
 Vue.use(Button);
 Vue.use(Link);
+import '@vant/touch-emulator';
 import { Tabbar, TabbarItem } from 'vant';
 import { Icon } from 'vant';
 import { List } from 'vant';
@@ -45,8 +47,13 @@ import { ActionSheet } from 'vant';
 import { ShareSheet } from 'vant';
 import { Popover } from 'vant';
 import { Dialog } from 'vant';
+import { Overlay } from 'vant';
+import { Empty } from 'vant';
+import { DatetimePicker } from 'vant';
 
-// 全局注册
+Vue.use(DatetimePicker);
+Vue.use(Empty);
+Vue.use(Overlay);
 Vue.use(Dialog);
 Vue.use(Popover);
 Vue.use(ShareSheet);

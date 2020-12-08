@@ -16,7 +16,6 @@
 <script>
 import Tabbar from "../components/Public/Tabbar";
 import Notify from "../components/Message/Notify";
-
 export default {
   name: "Messages",
   components: {
@@ -29,6 +28,7 @@ export default {
       isLoading: false,
     };
   },
+
   methods: {
     onRefresh() {
       setTimeout(() => {
@@ -37,6 +37,7 @@ export default {
         this.count++;
       }, 1000);
     },
+   
   },
 };
 </script>

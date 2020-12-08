@@ -8,7 +8,7 @@
       </div>
       <div class="fl">
         <div class="zone-title">{{ info.zoneName }}</div>
-        <div class="user">
+        <div class="user" @click="goUserInfo">
           <van-image
             round
             class="avatar"
@@ -31,7 +31,6 @@
       @click="viewImage"
       v-for="image in info.images"
       :key="image"
-      width="80"
     >
       <template v-slot:loading>
         <van-loading type="spinner" size="20" />
@@ -136,6 +135,15 @@ export default {
             this.$toast.fail(err.response.data.message);
           });
       }
+    },
+    goUserInfo() {
+      if (this.$router.name != "Others") {
+        var userId = this.info.userId;
+        this.$router.push({
+          path: `/Others/${userId}`,
+        });
+      }
+      event.stopPropagation();
     },
   },
 };

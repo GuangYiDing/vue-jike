@@ -1,6 +1,6 @@
 <template>
   <div class="Content">
-    <header>
+    <header @click="goUserInfo">
       <div class="avatar fl">
         <van-image
           round
@@ -12,7 +12,9 @@
         ></van-image>
       </div>
       <div class="userInfo">
-        {{ this.content.userName }}
+        <div class="userName">
+          {{ this.content.userName }}
+        </div>
         <span>{{ content.signature }}</span>
       </div>
       <div class="follow fr">
@@ -26,7 +28,6 @@
         @click="viewImage"
         v-for="image in content.images"
         :key="image"
-        width="80"
       ></van-image>
     </div>
     <div class="time">
@@ -138,6 +139,15 @@ export default {
           });
       }
     },
+    goUserInfo() {
+      if (this.$router.name != "Others") {
+        var userId = this.content.userId;
+        this.$router.push({
+          path: `/Others/${userId}`,
+        });
+      }
+      event.stopPropagation();
+    },
   },
 };
 </script>
@@ -161,11 +171,8 @@ export default {
 }
 .Content header .userInfo span {
   display: inline-block;
-  position: relative;
   font-size: 12px;
   color: #9e9e9e;
-  left: -34%;
-  top: 20px;
 }
 .Content .desc {
   padding: 12px;

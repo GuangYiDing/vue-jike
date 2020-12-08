@@ -193,10 +193,10 @@ export default {
           .then((resp) => {
             if (resp.data.code == 200) {
               this.$toast.success("登录成功~");
-              console.log(resp);
               this.$store.commit("setToken", resp.data.data);
               this.$router.push("/");
               location.reload();
+              this.$emit("connectMQ");
             } else {
               this.$toast.fail(resp.data.message);
               this.loginVerify = false;

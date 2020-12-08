@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     onClickLeft() {
-      this.$router.push("/");
+      this.$router.go(-1);
     },
     loadContent() {
       this.axios
@@ -136,24 +136,22 @@ export default {
       this.axios
         .post(
           "/jike-api/comm",
-          JSON.stringify(
-            {
-              trendId: this.$route.params.id,
-              content: replyContentPayload.content,
-              images: replyContentPayload.images,
-              parentId:
-                this.replyUserInfo.commId == undefined
-                  ? 0
-                  : this.replyUserInfo.parentId == 0
-                  ? this.replyUserInfo.commId
-                  : this.replyUserInfo.parentId,
+          JSON.stringify({
+            trendId: this.$route.params.id,
+            content: replyContentPayload.content,
+            images: replyContentPayload.images,
+            parentId:
+              this.replyUserInfo.commId == undefined
+                ? 0
+                : this.replyUserInfo.parentId == 0
+                ? this.replyUserInfo.commId
+                : this.replyUserInfo.parentId,
+          }),
+          {
+            headers: {
+              Authorization: this.$store.state.token,
             },
-            {
-              headers: {
-                Authorization: this.$store.state.token,
-              },
-            }
-          )
+          }
         )
         .then((resp) => {
           this.$toast.success(resp.data);

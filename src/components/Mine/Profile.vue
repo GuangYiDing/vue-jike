@@ -1,5 +1,18 @@
 <template>
-  <div class="Profile" @change="scaleBackground">
+  <div class="Profile">
+    <van-sticky>
+      <van-nav-bar
+        v-if="this.$route.name == 'Others'"
+        title="信息"
+        left-text="返回"
+        left-arrow
+        @click-left="
+          () => {
+            this.$router.go(-1);
+          }
+        "
+      />
+    </van-sticky>
     <div class="top">
       <div class="one-line">
         <div class="avatar">
@@ -9,10 +22,8 @@
             </template>
           </van-image>
         </div>
-        <div class="btn">
-          <el-button plain size="mini" round>编辑资料</el-button>
-        </div>
-        <div class="setting">
+
+        <div class="setting" v-if="this.$route.name == 'Mine'">
           <van-popover
             v-model="showPopover"
             theme="dark"
@@ -26,37 +37,77 @@
           </van-popover>
         </div>
       </div>
-
       <div class="nike">{{ userInfo.userName }}</div>
       <div class="signature">{{ userInfo.signature }}</div>
       <div class="follow">
-        {{ userInfo.following }} <span> 关注 </span> | {{ userInfo.followed }}
-        <span>被关注</span>
+        <strong> {{ userInfo.following }}</strong>
+        <span> 关注 </span> |
+        <strong>{{ userInfo.followed }}</strong>
+        <span> 被关注</span>
       </div>
     </div>
-    <div class="bottom"></div>
+    <div class="bottom">
+      <van-tabs v-model="activeTabs" color="#1989fa">
+        <van-tab title="动态"
+          ><Cards
+            :list="list"
+            @cardsOnload="onload"
+            @cardsOnRefresh="onRefresh" />
+          <van-empty description="暂无动态" v-if="list.length == 0"
+        /></van-tab>
+        <van-tab title="档案"
+          ><div class="record">
+            <div class="title"><van-icon name="user-o" />基本信息</div>
+            <div class="attr">
+              性别
+              <div class="value">{{ usereProfile.gender }}</div>
+            </div>
+            <div class="attr">
+              情感
+              <div class="value">{{ usereProfile.emotion }}</div>
+            </div>
+            <div class="attr">
+              生日
+              <div class="value">{{ usereProfile.birthday }}</div>
+            </div>
+          </div></van-tab
+        >
+      </van-tabs>
+    </div>
+    <van-overlay :show="aboutVisivle" @click="aboutVisivle = false">
+      <div class="wrapper" @click="aboutVisivle = false">
+        CopyRight © 2020 608·考研吧
+      </div>
+    </van-overlay>
   </div>
 </template>
 
 <script>
 import Iurl from "../../axios/constants";
+import Cards from "../Trends/Cards";
 export default {
   name: "Profile",
+  components: { Cards },
   data() {
     return {
       showPopover: false,
-      actions: [{ text: "注销" }],
+      actions: [{ text: "编辑资料" }, { text: "注销" }, { text: "关于" }],
       userInfo: {},
+      aboutVisivle: false,
+      activeTabs: 0,
+      list: [],
+      usereProfile: {},
     };
   },
   mounted() {
     this.getUserInfo();
+    this.getProfile();
   },
   methods: {
-    scaleBackground() {
-      console.log(window.onscroll());
-    },
     onSelect(action) {
+      if (action.text == "编辑资料") {
+        this.$router.push("/Personal");
+      }
       if (action.text == "注销") {
         this.axios
           .get("/jike-api/users/logout", {
@@ -74,19 +125,117 @@ export default {
             this.$toast.fail(err.message);
           });
       }
+      if (action.text == "关于") {
+        this.aboutVisivle = true;
+      }
     },
     getUserInfo() {
-      this.axios
-        .get("/jike-api/users/info", {
-          headers: {
-            Authorization: this.$store.state.token,
-          },
-        })
-        .then((resp) => {
-          console.log(resp.data.data);
-          this.userInfo = resp.data.data;
-          this.userInfo.userAvatar = Iurl.perview + resp.data.data.avatar;
-        });
+      if (this.$router.name == "Mine") {
+        this.axios
+          .get("/jike-api/users/info", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            console.log(resp.data.data);
+            this.userInfo = resp.data.data;
+            this.userInfo.userAvatar = Iurl.perview + resp.data.data.avatar;
+            $(".top").css(
+              "background-image",
+              "url(" + Iurl.perview + resp.data.data.cover + ")"
+            );
+          });
+      } else {
+        this.axios
+          .get("/jike-api/users/info/others", {
+            params: { userId: this.$route.params.userId },
+          })
+          .then((resp) => {
+            console.log(resp.data.data);
+            this.userInfo = resp.data.data;
+            this.userInfo.userAvatar = Iurl.perview + resp.data.data.avatar;
+            $(".top").css(
+              "background-image",
+              "url(" + Iurl.perview + resp.data.data.cover + ")"
+            );
+          });
+      }
+    },
+    getProfile() {
+      if (this.$router.name == "Mine") {
+        this.axios
+          .get("/jike-api/users/personal", {
+            headers: { Authorization: this.$store.state.token },
+          })
+          .then((resp) => {
+            this.usereProfile = resp.data.data;
+          });
+      } else {
+        this.axios
+          .get("/jike-api/users/personal/others", {
+            params: { userId: this.$route.params.userId },
+          })
+          .then((resp) => {
+            this.usereProfile = resp.data.data;
+          });
+      }
+    },
+    onload() {
+      this.loadTrend();
+    },
+    async onRefresh() {
+      await this.loadTrend();
+    },
+    loadTrend() {
+      if (this.$router.name == "Mine") {
+        this.axios
+          .get("/jike-api/trend/personal", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            const list = resp.data.data;
+            list.filter((item) => {
+              let imageStr = item.images.slice(1, item.images.length - 1);
+              let imagesArr = imageStr.split(",");
+              let perviewArr = imagesArr.map((i) => {
+                return (i = Iurl.perview + i);
+              });
+              item.images = perviewArr;
+              item.userAvatar = Iurl.perview + item.userAvatar;
+              item.zoneAvatar = Iurl.perview + item.zoneAvatar;
+            });
+            this.list = list;
+            this.$toast.clear();
+            this.finished = true;
+          });
+      } else {
+        this.axios
+          .get("/jike-api/trend/others", {
+            params: { userId: this.$route.params.userId },
+          })
+          .then((resp) => {
+            const list = resp.data.data;
+            list.filter((item) => {
+              let imageStr = item.images.slice(1, item.images.length - 1);
+              let imagesArr = imageStr.split(",");
+              let perviewArr = imagesArr.map((i) => {
+                return (i = Iurl.perview + i);
+              });
+              item.images = perviewArr;
+              item.userAvatar = Iurl.perview + item.userAvatar;
+              item.zoneAvatar = Iurl.perview + item.zoneAvatar;
+            });
+            this.list = list;
+            this.$toast.clear();
+            this.finished = true;
+          });
+      }
+    },
+    reloadTrend() {
+      this.loadTrend();
     },
   },
 };
@@ -94,32 +243,39 @@ export default {
 
 <style>
 .Profile {
-  background-size: 100%;
+  color: #000;
 }
 .Profile .top {
-  margin: 12px;
+  padding: 12px 12px 12px 24px;
+  color: #fff;
+  height: 25vh;
+  background-size: cover;
+  background-image: url("https://gitee.com/xiaodingsiren/JikePic/raw/master/images/gcS0gSnipaste_2020-11-18_23-13-01.png");
+}
+.Profile .top div {
+  margin: 6px 0px;
 }
 .Profile .top .one-line {
   display: flex;
+  margin-top: 2vh;
 }
 .Profile .top .one-line .btn {
   display: flex;
   align-items: center;
 }
-.setting {
+.Profile .top .one-line .setting {
   flex: 1;
 }
-.setting i {
+.Profile .top .one-line .setting i {
   line-height: 66px;
-  /* margin-left: 60px; */
 }
-.setting span {
+.Profile .top .one-line .setting span {
   position: relative;
-  left: 65%;
+  left: 76%;
 }
 .Profile .top .nike,
-.Profile .top .follow {
-  font-size: 900;
+.Profile .top .follow strong {
+  font-weight: 900;
 }
 .Profile .top span {
   font-size: 12px;
@@ -128,10 +284,34 @@ export default {
   border-radius: 25px;
   position: relative;
   top: 20%;
-  background-color: aliceblue;
 }
 .Profile .signature {
-  color: #8e8e8e8e;
+  /* color: #8e8e8e8e; */
   font-size: 14px;
+}
+.Profile .wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #fff;
+}
+.Profile .record .attr,
+.Profile .record .value {
+  padding: 12px;
+}
+
+.Profile .record .attr,
+.Profile .record .value {
+  color: #8e8e8e8e;
+}
+.Profile .record .value {
+  display: inline-block;
+}
+.Profile .record .title {
+  font-weight: 900;
+}
+.Profile .record .title i {
+  margin: 0 12px;
 }
 </style>

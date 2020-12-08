@@ -17,10 +17,6 @@ export default {
     Tabbar,
     Profile,
   },
-  methods: {},
-  created() {
-    
-  },
 };
 </script>
 
