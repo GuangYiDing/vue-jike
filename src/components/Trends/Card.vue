@@ -48,7 +48,7 @@
     </div>
     <footer>
       <div class="like">
-        <van-icon name="like" v-if="isLiked" color="red" />
+        <van-icon name="like" v-if="isLiked" color="red" @click="idontlikeit" />
         <van-icon name="like-o" v-if="!isLiked" @click="ilikeit" />
         <span>
           {{ info.likesCount }}
@@ -128,6 +128,33 @@ export default {
           )
           .then((resp) => {
             if (resp.data.code == 200) {
+              this.$toast({
+                icon: "like-o",
+                message: "好家伙",
+              });
+              this.$emit("reloadTrend");
+            }
+          })
+          .catch((err) => {
+            this.$toast.fail(err.response.data.message);
+          });
+      }
+    },
+    idontlikeit() {
+      event.stopPropagation();
+      if (this.loginCheck()) {
+        this.axios({
+          method: "delete",
+          url: "/jike-api/like/trend",
+          params: { trendId: this.info.trendId },
+          headers: { Authorization: this.$store.state.token },
+        })
+          .then((resp) => {
+            if (resp.data.code == 200) {
+              this.$toast({
+                icon: "bulb-o",
+                message: "👋 拜拜了您嘞",
+              });
               this.$emit("reloadTrend");
             }
           })

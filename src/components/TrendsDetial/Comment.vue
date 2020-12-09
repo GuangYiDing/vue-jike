@@ -24,7 +24,12 @@
           <span>{{ comm.createTime }}</span>
         </div>
         <div class="like fr">
-          <van-icon name="like" v-if="isLiked" color="red" />
+          <van-icon
+            name="like"
+            v-if="isLiked"
+            color="red"
+            @click="idontlikeit"
+          />
           <van-icon name="like-o" v-if="!isLiked" @click="ilikeit" />
           <span>{{ comm.likesCount }}</span>
         </div>
@@ -165,6 +170,29 @@ export default {
               this.$toast({
                 icon: "like-o",
                 message: "好家伙",
+              });
+              this.$emit("reloadComm");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+    idontlikeit() {
+      event.stopPropagation();
+      if (this.loginCheck()) {
+        this.axios({
+          method: "delete",
+          url: "/jike-api/like/comm",
+          params: { commId: this.comm.commId },
+          headers: { Authorization: this.$store.state.token },
+        })
+          .then((resp) => {
+            if (resp.data.code == 200) {
+              this.$toast({
+                icon: "bulb-o",
+                message: "👋 拜拜了您嘞",
               });
               this.$emit("reloadComm");
             }

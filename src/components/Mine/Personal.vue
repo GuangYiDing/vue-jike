@@ -290,7 +290,6 @@ export default {
   position: relative;
   top: -35%;
   text-align: center;
-  color: #fff;
   background: rgb(0 0 0 / 30%);
 }
 .Personal .changeBcgBtn {

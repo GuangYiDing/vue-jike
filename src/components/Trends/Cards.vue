@@ -8,7 +8,7 @@
       <van-list
         v-model="loading"
         :finished="finished"
-        finished-text="没有更多了"
+        finished-text="空空如也"
         @load="onLoad"
       >
         <card
@@ -41,19 +41,17 @@ export default {
     };
   },
   methods: {
-    onLoad() {
+    async onLoad() {
       this.$toast.loading({
         message: "加载中...",
         forbidClick: true,
       });
       this.$emit("cardsOnload");
-
-      this.getLikedTrend();
+      await this.getLikedTrend();
     },
     async onRefresh() {
       this.$emit("cardsOnRefresh");
-      this.getLikedTrend();
-      this.isLoading = false;
+      await this.getLikedTrend();
     },
     getLikedTrend() {
       if (this.$store.state.token != null) {
@@ -65,15 +63,13 @@ export default {
           })
           .then((resp) => {
             this.likedTrend = resp.data.data;
+            this.isLoading = false;
+            this.finished = true;
           });
       }
     },
     reloadTrend() {
       this.$emit("reloadTrend");
-      this.$toast({
-        icon: "like-o",
-        message: "好家伙",
-      });
       this.getLikedTrend();
     },
   },

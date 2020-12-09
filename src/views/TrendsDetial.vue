@@ -13,6 +13,7 @@
         :content="detailContent"
         @replyTrend="replyTo"
         :likedTrend="likedTrend"
+        :isFollowing="isFollowing"
         @reloadContent="reloadContent"
       />
       <Comments
@@ -49,12 +50,14 @@ export default {
       replyUserInfo: {},
       replyPlaceHolder: "",
       likedTrend: [],
+      isFollowing:[]
     };
   },
   mounted() {
     this.loadContent();
     this.loadComments();
     this.getLikedTrend();
+    this.getFollowing();
     // this.axios.all([this.loadContent(), this.getLikedTrend()]).then(
     //   this.axios.spread((resp1, resp2) => {
     //   })
@@ -82,11 +85,10 @@ export default {
           this.detailContent = item;
           this.detailContent.description =
             item.description.length > 15
-              ? item.description.slice(0, 12) + "..."
+              ? item.description.slice(0, 15) + "..."
               : item.description;
           // 回复框占位符默认动态主名
           this.replyPlaceHolder = this.detailContent.userName;
-          this.getLikedTrend();
         });
     },
     async loadComments() {
@@ -174,11 +176,28 @@ export default {
           });
       }
     },
+     getFollowing() {
+       if (this.$store.state.token!=null) {
+
+      this.axios
+        .get("/jike-api/follow", {
+          headers: {
+            Authorization: this.$store.state.token,
+          },
+        })
+        .then((resp) => {
+          this.isFollowing = resp.data.data;
+        });         
+       }
+    },
     reloadComm() {
       this.loadComments();
     },
     reloadContent() {
       this.loadContent();
+        if (this.$store.state.token!=null) {
+          this.isFollowing();
+        }
     },
   },
 };

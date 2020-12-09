@@ -18,7 +18,19 @@
         <span>{{ content.signature }}</span>
       </div>
       <div class="follow fr">
-        <el-button size="small" round type="primary">关注</el-button>
+       <el-button
+      round
+      size="small"
+      type="primary"
+      @click="follwing()"
+      v-if="!isFollowed"
+      >关注TA</el-button>
+    <el-button
+      v-if="isFollowed"
+         size="small"
+      round
+      @click="cancelFollwing()"
+      >取消关注</el-button>
       </div>
     </header>
     <div class="desc">{{ this.content.content }}</div>
@@ -46,12 +58,12 @@
         </div>
       </div>
       <div class="join fr">
-        <el-button size="mini" round>加入</el-button>
+        <!-- <el-button size="mini" round>加入</el-button> -->
       </div>
     </div>
     <footer>
       <div class="like">
-        <van-icon name="like" v-if="isLiked" color="red" />
+        <van-icon name="like" v-if="isLiked" color="red" @click="idontlikeit" />
         <van-icon name="like-o" v-if="!isLiked" @click="ilikeit" />
         <span>
           {{ content.likesCount }}
@@ -71,10 +83,7 @@
 import { ImagePreview } from "vant";
 export default {
   name: "Content",
-  props: ["content", "likedTrend"],
-  data() {
-    return {};
-  },
+  props: ["content", "likedTrend","isFollowing"],
   computed: {
     isLiked() {
       for (var value of this.likedTrend) {
@@ -82,8 +91,34 @@ export default {
       }
       return false;
     },
+     isFollowed() {
+      for (var value of this.isFollowing) {
+        if (value == this.content.userId) return true;
+      }
+      return false;
+    },
   },
   methods: {
+    checkLogin() {
+      if (this.$store.state.token == null) {
+        this.$dialog
+          .confirm({
+            title: "哦吼",
+            message: "还没登录?来登录一起搞事吧😎~",
+            confirmButtonText: "去登录",
+            cancelButtonText: "我才不",
+          })
+          .then(() => {
+            this.$router.push("/Login");
+          })
+          .catch(() => {
+            return false;
+          });
+        return false;
+      } else {
+        return true;
+      }
+    },
     viewImage() {
       ImagePreview(this.content.images);
     },
@@ -139,6 +174,29 @@ export default {
           });
       }
     },
+    idontlikeit() {
+      event.stopPropagation();
+      if (this.loginCheck()) {
+        this.axios({
+          method: "delete",
+          url: "/jike-api/like/trend",
+          params: { trendId: this.content.trendId },
+          headers: { Authorization: this.$store.state.token },
+        })
+          .then((resp) => {
+            if (resp.data.code == 200) {
+              this.$toast({
+                icon: "bulb-o",
+                message: "👋 拜拜了您嘞",
+              });
+              this.$emit("reloadContent");
+            }
+          })
+          .catch((err) => {
+            this.$toast.fail(err.response.data.message);
+          });
+      }
+    },
     goUserInfo() {
       if (this.$router.name != "Others") {
         var userId = this.content.userId;
@@ -147,6 +205,36 @@ export default {
         });
       }
       event.stopPropagation();
+    },
+     follwing() {
+       event.stopPropagation();
+       if(this.checkLogin()){
+      this.axios({
+        method: "post",
+        url: "/jike-api/follow",
+        params: { followingUserId: this.content.userId },
+        headers: {
+          Authorization: this.$store.state.token,
+        },
+      }).then((resp) => {
+        console.log(resp);
+        this.$toast(resp.data.message);
+      });
+       }
+    },
+    cancelFollwing() {
+         event.stopPropagation();
+      this.axios({
+        method: "delete",
+        url: "/jike-api/follow",
+        params: { cancelFollowingUserId: this.content.userId },
+        headers: {
+          Authorization: this.$store.state.token,
+        },
+      }).then((resp) => {
+        console.log(resp);
+        this.$toast(resp.data.message);
+      });
     },
   },
 };

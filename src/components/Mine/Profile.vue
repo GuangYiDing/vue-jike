@@ -52,7 +52,8 @@
           ><Cards
             :list="list"
             @cardsOnload="onload"
-            @cardsOnRefresh="onRefresh" />
+            @cardsOnRefresh="onRefresh"
+            @reloadTrend="reloadTrend" />
           <van-empty description="暂无动态" v-if="list.length == 0"
         /></van-tab>
         <van-tab title="档案"
@@ -60,15 +61,15 @@
             <div class="title"><van-icon name="user-o" />基本信息</div>
             <div class="attr">
               性别
-              <div class="value">{{ usereProfile.gender }}</div>
+              <div class="value">{{ userProfile.gender }}</div>
             </div>
             <div class="attr">
               情感
-              <div class="value">{{ usereProfile.emotion }}</div>
+              <div class="value">{{ userProfile.emotion }}</div>
             </div>
             <div class="attr">
               生日
-              <div class="value">{{ usereProfile.birthday }}</div>
+              <div class="value">{{ userProfile.birthday }}</div>
             </div>
           </div></van-tab
         >
@@ -96,7 +97,7 @@ export default {
       aboutVisivle: false,
       activeTabs: 0,
       list: [],
-      usereProfile: {},
+      userProfile: {},
     };
   },
   mounted() {
@@ -130,7 +131,7 @@ export default {
       }
     },
     getUserInfo() {
-      if (this.$router.name == "Mine") {
+      if (this.$route.name == "Mine") {
         this.axios
           .get("/jike-api/users/info", {
             headers: {
@@ -138,7 +139,6 @@ export default {
             },
           })
           .then((resp) => {
-            console.log(resp.data.data);
             this.userInfo = resp.data.data;
             this.userInfo.userAvatar = Iurl.perview + resp.data.data.avatar;
             $(".top").css(
@@ -163,13 +163,22 @@ export default {
       }
     },
     getProfile() {
-      if (this.$router.name == "Mine") {
+      if (this.$route.name == "Mine") {
         this.axios
           .get("/jike-api/users/personal", {
             headers: { Authorization: this.$store.state.token },
           })
           .then((resp) => {
-            this.usereProfile = resp.data.data;
+            this.userProfile = resp.data.data;
+            if (this.userProfile.gender == null) {
+              this.userProfile.gender = "是个秘密";
+            }
+            if (this.userProfile.birthday == null) {
+              this.userProfile.birthday = "是个秘密";
+            }
+            if (this.userProfile.emotion == null) {
+              this.userProfile.emotion = "是个秘密";
+            }
           });
       } else {
         this.axios
@@ -177,7 +186,16 @@ export default {
             params: { userId: this.$route.params.userId },
           })
           .then((resp) => {
-            this.usereProfile = resp.data.data;
+            this.userProfile = resp.data.data;
+            if (this.userProfile.gender == null) {
+              this.userProfile.gender = "是个秘密";
+            }
+            if (this.userProfile.birthday == null) {
+              this.userProfile.birthday = "是个秘密";
+            }
+            if (this.userProfile.emotion == null) {
+              this.userProfile.emotion = "是个秘密";
+            }
           });
       }
     },
@@ -188,7 +206,7 @@ export default {
       await this.loadTrend();
     },
     loadTrend() {
-      if (this.$router.name == "Mine") {
+      if (this.$route.name == "Mine") {
         this.axios
           .get("/jike-api/trend/personal", {
             headers: {
@@ -247,7 +265,6 @@ export default {
 }
 .Profile .top {
   padding: 12px 12px 12px 24px;
-  color: #fff;
   height: 25vh;
   background-size: cover;
   background-image: url("https://gitee.com/xiaodingsiren/JikePic/raw/master/images/gcS0gSnipaste_2020-11-18_23-13-01.png");

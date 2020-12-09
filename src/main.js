@@ -50,7 +50,9 @@ import { Dialog } from 'vant';
 import { Overlay } from 'vant';
 import { Empty } from 'vant';
 import { DatetimePicker } from 'vant';
+import { Tag } from 'vant';
 
+Vue.use(Tag);
 Vue.use(DatetimePicker);
 Vue.use(Empty);
 Vue.use(Overlay);

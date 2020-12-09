@@ -9,7 +9,7 @@
           left-arrow
           @click-left="
             () => {
-              this.$router.go(-1);
+              this.$router.push('/');
             }
           "
           @click-right="postTrend"
