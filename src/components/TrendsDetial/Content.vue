@@ -18,23 +18,25 @@
         <span>{{ content.signature }}</span>
       </div>
       <div class="follow fr">
-       <el-button
-      round
-      size="small"
-      type="primary"
-      @click="follwing()"
-      v-if="!isFollowed"
-      >关注TA</el-button>
-    <el-button
-      v-if="isFollowed"
-         size="small"
-      round
-      @click="cancelFollwing()"
-      >取消关注</el-button>
+        <el-button
+          round
+          size="small"
+          type="primary"
+          @click="follwing()"
+          v-if="!isFollowed"
+          >关注TA</el-button
+        >
+        <el-button
+          v-if="isFollowed"
+          size="small"
+          round
+          @click="cancelFollwing()"
+          >取消关注</el-button
+        >
       </div>
     </header>
     <div class="desc">{{ this.content.content }}</div>
-    <div class="images">
+    <div class="images" v-if="content.images > 0">
       <van-image
         :src="image"
         @click="viewImage"
@@ -83,7 +85,7 @@
 import { ImagePreview } from "vant";
 export default {
   name: "Content",
-  props: ["content", "likedTrend","isFollowing"],
+  props: ["content", "likedTrend", "isFollowing"],
   computed: {
     isLiked() {
       for (var value of this.likedTrend) {
@@ -91,7 +93,7 @@ export default {
       }
       return false;
     },
-     isFollowed() {
+    isFollowed() {
       for (var value of this.isFollowing) {
         if (value == this.content.userId) return true;
       }
@@ -206,24 +208,24 @@ export default {
       }
       event.stopPropagation();
     },
-     follwing() {
-       event.stopPropagation();
-       if(this.checkLogin()){
-      this.axios({
-        method: "post",
-        url: "/jike-api/follow",
-        params: { followingUserId: this.content.userId },
-        headers: {
-          Authorization: this.$store.state.token,
-        },
-      }).then((resp) => {
-        this.$emit("reloadFollow")
-        this.$toast(resp.data.message);
-      });
-       }
+    follwing() {
+      event.stopPropagation();
+      if (this.checkLogin()) {
+        this.axios({
+          method: "post",
+          url: "/jike-api/follow",
+          params: { followingUserId: this.content.userId },
+          headers: {
+            Authorization: this.$store.state.token,
+          },
+        }).then((resp) => {
+          this.$emit("reloadFollow");
+          this.$toast(resp.data.message);
+        });
+      }
     },
     cancelFollwing() {
-         event.stopPropagation();
+      event.stopPropagation();
       this.axios({
         method: "delete",
         url: "/jike-api/follow",
@@ -232,7 +234,7 @@ export default {
           Authorization: this.$store.state.token,
         },
       }).then((resp) => {
-        this.$emit("reloadFollow")
+        this.$emit("reloadFollow");
         this.$toast(resp.data.message);
       });
     },

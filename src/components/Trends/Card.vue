@@ -34,16 +34,18 @@
     <div class="content">
       {{ info.content }}
     </div>
-    <van-image
-      :src="image"
-      @click="viewImage"
-      v-for="image in info.images"
-      :key="image"
-    >
-      <template v-slot:loading>
-        <van-loading type="spinner" size="20" />
-      </template>
-    </van-image>
+    <div class="images" v-if="info.images.length > 0">
+      <van-image
+        :src="image"
+        @click="viewImage"
+        v-for="image in info.images"
+        :key="image"
+      >
+        <template v-slot:loading>
+          <van-loading type="spinner" size="20" />
+        </template>
+      </van-image>
+    </div>
     <div class="comments" v-show="false">
       <div class="hot">
         <van-icon name="fire" />热评
