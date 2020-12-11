@@ -132,7 +132,7 @@ export default {
       }
     },
     postCheck() {
-      if (this.$store.state.token == "") {
+      if (this.$store.state.token == null) {
         this.$dialog
           .confirm({
             title: "哦吼",

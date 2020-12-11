@@ -217,7 +217,7 @@ export default {
           Authorization: this.$store.state.token,
         },
       }).then((resp) => {
-        console.log(resp);
+        this.$emit("reloadFollow")
         this.$toast(resp.data.message);
       });
        }
@@ -232,7 +232,7 @@ export default {
           Authorization: this.$store.state.token,
         },
       }).then((resp) => {
-        console.log(resp);
+        this.$emit("reloadFollow")
         this.$toast(resp.data.message);
       });
     },

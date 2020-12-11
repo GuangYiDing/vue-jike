@@ -3,7 +3,7 @@
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
       <div class="slogan">
         <h2>记录我,遇见你</h2>
-        <span>关注其他用户后,他们的动态会动态展示</span>
+        <span>关注其他用户后,他们的动态会在动态中展示</span>
       </div>
       <swiper ref="mySwiper" :options="swiperOptions" >
         <swiper-slide v-for="item in infos" :key="item.id">

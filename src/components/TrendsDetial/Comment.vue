@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       actionSheetVisible: false,
-      actions: [{ name: "回复" }, { name: "复制" }, { name: "分享" }],
+      actions: [{ name: "回复" }, { name: "分享" }],
       replyChildInfo: {},
     };
   },
@@ -121,6 +121,9 @@ export default {
           this.$emit("replyToComm", this.replyChildInfo);
         }
       }
+      // if(item.name == "分享"){
+
+      // }
       this.actionSheetVisible = false;
     },
     viewImage() {
@@ -158,6 +161,7 @@ export default {
             "/jike-api/like/comm",
             JSON.stringify({
               commId: this.comm.commId,
+              trendId: parseInt(this.$route.params.id),
             }),
             {
               headers: {

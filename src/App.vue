@@ -2,12 +2,16 @@
   <div id="app">
     <keep-alive include="Trends,Friends">
       <!-- 需要缓存的视图组件 -->
-      <router-view v-if="isRouterAlive"></router-view>
+      <router-view v-if="isRouterAlive"  :key="key"></router-view>
     </keep-alive>
   </div>
 </template>
 
 <script>
+// import { Notification } from 'element-ui';
+// import { Icon } from 'element-ui';
+// import Vue from 'vue'
+// Vue.use(Icon)
 import Stomp from "stompjs";
 export default {
   name: "App",
@@ -15,6 +19,11 @@ export default {
     return {
       reload: this.reload,
     };
+  },
+  computed:{
+    key(){
+     return  this.$route.fullPath
+    }
   },
   data() {
     return {
@@ -58,17 +67,22 @@ export default {
       console.log("Connected: " + frame);
       //绑定交换机exchange_pushmsg是交换机的名字rk_pushmsg是绑定的路由key
       var exchange =
-        "/exchange/exchange_jike_msg_push/" + this.$store.state.token;
+        "/exchange/exchange_jike_msg/" + this.$store.state.token;
       //创建随机队列用上面的路由key绑定交换机,放入收到消息后的回调函数和失败的回调函数
       this.client.subscribe(exchange, this.responseCallback, this.onFailed);
       console.log(frame);
+
+
     },
     onFailed(frame) {
       console.log("Failed: " + frame);
     },
     responseCallback(frame) {
-      this.$toast(frame.body);
-      console.log(frame);
+        //     Notification({
+        //   title: '成功',
+        //   message:frame.body,
+        //   type: 'success'
+        // });
       //接收到服务器推送消息，向服务器定义的接收消息routekey路由rk_recivemsg发送确认消息
       this.client.send(
         "/exchange/exchange_jike_msg_push/rk_recive_msg",

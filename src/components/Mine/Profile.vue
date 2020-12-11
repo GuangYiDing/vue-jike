@@ -53,7 +53,8 @@
             :list="list"
             @cardsOnload="onload"
             @cardsOnRefresh="onRefresh"
-            @reloadTrend="reloadTrend" />
+            @reloadTrend="reloadTrend"
+            />
           <van-empty description="暂无动态" v-if="list.length == 0"
         /></van-tab>
         <van-tab title="档案"
@@ -77,7 +78,7 @@
     </div>
     <van-overlay :show="aboutVisivle" @click="aboutVisivle = false">
       <div class="wrapper" @click="aboutVisivle = false">
-        CopyRight © 2020 608·考研吧
+        CopyRight © 2020 XiaoDingSiRen
       </div>
     </van-overlay>
   </div>

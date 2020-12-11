@@ -8,7 +8,7 @@
       @cardsOnRefresh="onRefresh"
       @reloadTrend="reloadTrend"
     />
-    <van-empty image="search" description="你所关注的用户动态将在此展示" />
+    <van-empty v-if="followingUserTrends.length == 0" image="search" description="你所关注的用户动态将在此展示" />
     <footer>
       <tabbar></tabbar>
     </footer>

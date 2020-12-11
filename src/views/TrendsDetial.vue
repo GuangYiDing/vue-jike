@@ -15,6 +15,7 @@
         :likedTrend="likedTrend"
         :isFollowing="isFollowing"
         @reloadContent="reloadContent"
+        @reloadFollow="reloadFollow"
       />
       <Comments
         @replyToUser="replyTo"
@@ -195,10 +196,14 @@ export default {
     },
     reloadContent() {
       this.loadContent();
+    this.getLikedTrend();
         if (this.$store.state.token!=null) {
           this.isFollowing();
         }
     },
+    reloadFollow(){
+          this.getFollowing();
+    }
   },
 };
 </script>

@@ -8,7 +8,7 @@
       <van-list
         v-model="loading"
         :finished="finished"
-        finished-text="空空如也"
+        finished-text="没有更多了"
         @load="onLoad"
       >
         <card

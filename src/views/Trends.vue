@@ -55,9 +55,8 @@ export default {
           item.zoneAvatar = Iurl.perview + item.zoneAvatar;
         });
         this.list = list;
-        this.$store.commit("setRecommendList", this.list);
+        this.$store.commit("setRecommendList", null);
         this.$toast.clear();
-        this.finished = true;
       });
     },
     reloadTrend() {

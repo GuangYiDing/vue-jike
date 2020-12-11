@@ -1,14 +1,14 @@
 <template>
   <div class="JTabBar">
-    <van-tabbar route v-model="active">
+    <van-tabbar route v-model="active" @change="onChange">
       <van-tabbar-item replace to="/friends" icon="friends-o"
         >动态</van-tabbar-item
       >
       <van-tabbar-item replace to="/" icon="orders-o">推荐</van-tabbar-item>
       <van-tabbar-item replace to="/post" icon="plus">发布</van-tabbar-item>
-      <van-tabbar-item replace to="/messages" icon="chat-o" badge="99+"
+      <!-- <van-tabbar-item replace to="/messages" icon="chat-o" badge="99+"
         >通知</van-tabbar-item
-      >
+      > -->
       <van-tabbar-item replace icon="user-circle-o" @click="checkLogin">
         我的</van-tabbar-item
       >
@@ -19,6 +19,7 @@
 <script>
 export default {
   name: "Tabbar",
+  inject:['reload'],
   data() {
     return {
       active: 2,
@@ -46,6 +47,10 @@ export default {
         this.$router.push("/Mine");
       }
     },
+    onChange(index){
+      console.log(index);
+      this.reload();
+    }
   },
 };
 </script>

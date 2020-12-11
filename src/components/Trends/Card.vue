@@ -1,5 +1,13 @@
 <template>
-  <div class="Card" :trentsId="info.trendsId" @click="goDetail(info.trendId)">
+  <div class="Card" @click="showDeleteActionsSheet">
+    <van-action-sheet
+      v-model="deleteVisible"
+      :actions="actions"
+      @select="onSelect"
+      cancel-text="取消"
+      @click-overlay="overlay"
+      @cancel="onCancel"
+    />
     <header>
       <div class="zone-img fl">
         <van-image width="40" height="40" :src="info.zoneAvatar">
@@ -71,7 +79,10 @@ export default {
   props: ["info", "likedTrend"],
   inject: ["reload"],
   data() {
-    return {};
+    return {
+      deleteVisible: false,
+      actions: [{ name: "查看原动态" }, { name: "删除" }],
+    };
   },
   computed: {
     images: () => {
@@ -85,6 +96,42 @@ export default {
     },
   },
   methods: {
+    showDeleteActionsSheet() {
+      if (this.$route.name == "Mine") {
+        this.deleteVisible = true;
+      } else {
+        this.goDetail(this.info.trendId);
+      }
+    },
+    onSelect(item) {
+      if (item.name == "查看原动态") {
+        this.goDetail(this.info.trendId);
+      }
+      if (item.name == "删除") {
+        this.$dialog
+          .confirm({
+            title: "哦吼",
+            message: "删除将不可撤销",
+            confirmButtonText: "删之",
+            cancelButtonText: "再想想",
+          })
+          .then(() => {
+            this.deleteTrend(this.info.trendId);
+          })
+          .catch(() => {
+            return false;
+          });
+      }
+      this.deleteVisible = false;
+    },
+    overlay() {
+      this.deleteVisible = false;
+      event.stopPropagation();
+    },
+    onCancel() {
+      this.deleteVisible = false;
+      event.stopPropagation();
+    },
     goDetail(id) {
       this.$router.push({
         path: `/TrendsDetial/${id}`,
@@ -171,6 +218,19 @@ export default {
         });
       }
       event.stopPropagation();
+    },
+    deleteTrend(trendId) {
+      this.axios({
+        method: "delete",
+        url: "/jike-api/trend/profile",
+        params: { trendId: trendId },
+        headers: {
+          Authorization: this.$store.state.token,
+        },
+      }).then(() => {
+        this.$toast.success("已删除");
+        this.$emit("reloadTrend");
+      });
     },
   },
 };

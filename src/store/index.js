@@ -7,14 +7,12 @@ const store = new Vuex.Store({
     state: {
         token: null,
         emojiList: { acList: [], aluList: [] },
-        recommendList: []
     },
     plugins: [createPersistedState()],
     mutations: {
         setToken: (state, token) => { state.token = token },
         setAcList: (state, palyload) => { state.emojiList.acList = palyload.acList },
         setAluList: (state, palyload) => { state.emojiList.aluList = palyload.aluList },
-        setRecommendList: (state, palyload) => { state.recommendList = palyload },
     },
     getters: {
         acList: state => {
