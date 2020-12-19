@@ -36,14 +36,31 @@
             </template>
           </van-popover>
         </div>
+        <div class="follow" v-if="this.$route.name == 'Others'">
+          <el-button
+            round
+            size="small"
+            type="primary"
+            @click="follwing()"
+            v-if="!isFollowed"
+            >关注TA</el-button
+          >
+          <el-button
+            v-if="isFollowed"
+            size="small"
+            round
+            @click="cancelFollwing()"
+            >取消关注</el-button
+          >
+        </div>
       </div>
       <div class="nike">{{ userInfo.userName }}</div>
       <div class="signature">{{ userInfo.signature }}</div>
       <div class="follow">
-        <strong> {{ userInfo.following }}</strong>
-        <span> 关注 </span> |
-        <strong>{{ userInfo.followed }}</strong>
-        <span> 被关注</span>
+        <strong @click="goFollowing"> {{ userInfo.following }}</strong>
+        <span @click="goFollowing"> 关注 </span> |
+        <strong @click="goFollowed">{{ userInfo.followed }}</strong>
+        <span @click="goFollowed"> 被关注</span>
       </div>
     </div>
     <div class="bottom">
@@ -53,8 +70,7 @@
             :list="list"
             @cardsOnload="onload"
             @cardsOnRefresh="onRefresh"
-            @reloadTrend="reloadTrend"
-            />
+            @reloadTrend="reloadTrend" />
           <van-empty description="暂无动态" v-if="list.length == 0"
         /></van-tab>
         <van-tab title="档案"
@@ -87,6 +103,7 @@
 <script>
 import Iurl from "../../axios/constants";
 import Cards from "../Trends/Cards";
+
 export default {
   name: "Profile",
   components: { Cards },
@@ -99,13 +116,43 @@ export default {
       activeTabs: 0,
       list: [],
       userProfile: {},
+      isFollowing: [],
     };
   },
   mounted() {
     this.getUserInfo();
     this.getProfile();
+    this.getAtuhFollowing();
+  },
+  computed: {
+    isFollowed() {
+      for (var value of this.isFollowing) {
+        if (value.id == this.$route.params.userId) return true;
+      }
+      return false;
+    },
   },
   methods: {
+    checkLogin() {
+      if (this.$store.state.token == null) {
+        this.$dialog
+          .confirm({
+            title: "哦吼",
+            message: "还没登录?来登录一起搞事吧😎~",
+            confirmButtonText: "去登录",
+            cancelButtonText: "我才不",
+          })
+          .then(() => {
+            this.$router.push("/Login");
+          })
+          .catch(() => {
+            return false;
+          });
+        return false;
+      } else {
+        return true;
+      }
+    },
     onSelect(action) {
       if (action.text == "编辑资料") {
         this.$router.push("/Personal");
@@ -217,12 +264,16 @@ export default {
           .then((resp) => {
             const list = resp.data.data;
             list.filter((item) => {
-              let imageStr = item.images.slice(1, item.images.length - 1);
-              let imagesArr = imageStr.split(",");
-              let perviewArr = imagesArr.map((i) => {
-                return (i = Iurl.perview + i);
-              });
-              item.images = perviewArr;
+              if (item.images.length > 3) {
+                let imageStr = item.images.slice(1, item.images.length - 1);
+                let imagesArr = imageStr.split(",");
+                let perviewArr = imagesArr.map((i) => {
+                  return (i = Iurl.perview + i);
+                });
+                item.images = perviewArr;
+              } else {
+                item.images = [];
+              }
               item.userAvatar = Iurl.perview + item.userAvatar;
               item.zoneAvatar = Iurl.perview + item.zoneAvatar;
             });
@@ -238,12 +289,16 @@ export default {
           .then((resp) => {
             const list = resp.data.data;
             list.filter((item) => {
-              let imageStr = item.images.slice(1, item.images.length - 1);
-              let imagesArr = imageStr.split(",");
-              let perviewArr = imagesArr.map((i) => {
-                return (i = Iurl.perview + i);
-              });
-              item.images = perviewArr;
+              if (item.images.length > 3) {
+                let imageStr = item.images.slice(1, item.images.length - 1);
+                let imagesArr = imageStr.split(",");
+                let perviewArr = imagesArr.map((i) => {
+                  return (i = Iurl.perview + i);
+                });
+                item.images = perviewArr;
+              } else {
+                item.images = [];
+              }
               item.userAvatar = Iurl.perview + item.userAvatar;
               item.zoneAvatar = Iurl.perview + item.zoneAvatar;
             });
@@ -255,6 +310,70 @@ export default {
     },
     reloadTrend() {
       this.loadTrend();
+    },
+    goFollowing() {
+      if (this.$route.name == "Mine") {
+        this.$router.push({
+          path: `/Following/${this.userInfo.id}`,
+        });
+      } else {
+        this.$router.push({
+          path: `/Following/${this.$route.params.userId}`,
+        });
+      }
+    },
+    goFollowed() {
+      if (this.$route.name == "Mine") {
+        this.$router.push({
+          path: `/Followed/${this.userInfo.id}`,
+        });
+      } else {
+        this.$router.push({
+          path: `/Followed/${this.$route.params.userId}`,
+        });
+      }
+    },
+    follwing() {
+      if (this.checkLogin()) {
+        this.axios({
+          method: "post",
+          url: "/jike-api/follow",
+          params: { followingUserId: this.$route.params.userId },
+          headers: {
+            Authorization: this.$store.state.token,
+          },
+        }).then((resp) => {
+          this.$toast(resp.data.message);
+          this.getAtuhFollowing();
+          this.getUserInfo();
+        });
+      }
+    },
+    cancelFollwing() {
+      this.axios({
+        method: "delete",
+        url: "/jike-api/follow",
+        params: { cancelFollowingUserId: this.$route.params.userId },
+        headers: {
+          Authorization: this.$store.state.token,
+        },
+      }).then((resp) => {
+        this.$toast(resp.data.message);
+        this.getAtuhFollowing();
+      });
+    },
+    getAtuhFollowing() {
+      if (this.$store.state.token != null) {
+        this.axios
+          .get("/jike-api/follow/Aing", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            this.isFollowing = resp.data.data;
+          });
+      }
     },
   },
 };
@@ -276,20 +395,22 @@ export default {
 .Profile .top .one-line {
   display: flex;
   margin-top: 2vh;
+  justify-content: space-between;
 }
 .Profile .top .one-line .btn {
   display: flex;
   align-items: center;
 }
 .Profile .top .one-line .setting {
-  flex: 1;
+  margin-right: 50px;
 }
 .Profile .top .one-line .setting i {
   line-height: 66px;
 }
-.Profile .top .one-line .setting span {
-  position: relative;
-  left: 76%;
+.Profile .top .one-line .follow {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .Profile .top .nike,
 .Profile .top .follow strong {

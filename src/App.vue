@@ -2,7 +2,7 @@
   <div id="app">
     <keep-alive include="Trends,Friends">
       <!-- 需要缓存的视图组件 -->
-      <router-view v-if="isRouterAlive"  :key="key"></router-view>
+      <router-view v-if="isRouterAlive" :key="key"></router-view>
     </keep-alive>
   </div>
 </template>
@@ -12,6 +12,8 @@
 // import { Icon } from 'element-ui';
 // import Vue from 'vue'
 // Vue.use(Icon)
+import { Dialog } from "vant";
+
 import Stomp from "stompjs";
 export default {
   name: "App",
@@ -20,10 +22,10 @@ export default {
       reload: this.reload,
     };
   },
-  computed:{
-    key(){
-     return  this.$route.fullPath
-    }
+  computed: {
+    key() {
+      return this.$route.fullPath;
+    },
   },
   data() {
     return {
@@ -33,6 +35,14 @@ export default {
   created() {
     this.stopF5Refresh();
     if (this.$store.state.token != null) this.connect();
+  },
+  mounted() {
+    if (!this.isMobile()) {
+      Dialog.alert({
+        title: "提醒",
+        message: "此项目并未适配PC端,请使用手机打开该项目,或使用移动端视图",
+      }).then(() => {});
+    }
   },
   destroyed() {
     this.disconnect();
@@ -66,23 +76,20 @@ export default {
     onConnected(frame) {
       console.log("Connected: " + frame);
       //绑定交换机exchange_pushmsg是交换机的名字rk_pushmsg是绑定的路由key
-      var exchange =
-        "/exchange/exchange_jike_msg/" + this.$store.state.token;
+      var exchange = "/exchange/exchange_jike_msg/" + this.$store.state.token;
       //创建随机队列用上面的路由key绑定交换机,放入收到消息后的回调函数和失败的回调函数
       this.client.subscribe(exchange, this.responseCallback, this.onFailed);
       console.log(frame);
-
-
     },
     onFailed(frame) {
       console.log("Failed: " + frame);
     },
     responseCallback(frame) {
-        //     Notification({
-        //   title: '成功',
-        //   message:frame.body,
-        //   type: 'success'
-        // });
+      //     Notification({
+      //   title: '成功',
+      //   message:frame.body,
+      //   type: 'success'
+      // });
       //接收到服务器推送消息，向服务器定义的接收消息routekey路由rk_recivemsg发送确认消息
       this.client.send(
         "/exchange/exchange_jike_msg_push/rk_recive_msg",
@@ -109,6 +116,12 @@ export default {
       this.client.disconnect(() => {
         console.log("stomp disconnected");
       });
+    },
+    isMobile() {
+      let flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      );
+      return flag;
     },
   },
 };

@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       actionSheetVisible: false,
-      actions: [{ name: "回复" }, { name: "分享" }],
+      actions: [{ name: "回复" }],
       replyChildInfo: {},
     };
   },

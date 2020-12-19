@@ -44,7 +44,6 @@ export default {
     loadTrend() {
       this.axios.get("/jike-api/trend/recommend").then((resp) => {
         const list = resp.data.data;
-
         list.filter((item) => {
           if (item.images.length > 3) {
             let imageStr = item.images.slice(1, item.images.length - 1);
@@ -59,9 +58,7 @@ export default {
           item.userAvatar = Iurl.perview + item.userAvatar;
           item.zoneAvatar = Iurl.perview + item.zoneAvatar;
         });
-        console.log(this.list);
         this.list = list;
-        this.$store.commit("setRecommendList", null);
         this.$toast.clear();
       });
     },

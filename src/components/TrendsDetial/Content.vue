@@ -95,7 +95,7 @@ export default {
     },
     isFollowed() {
       for (var value of this.isFollowing) {
-        if (value == this.content.userId) return true;
+        if (value.id == this.content.userId) return true;
       }
       return false;
     },

@@ -58,6 +58,18 @@ const routes = [
         name: 'Personal',
         component: () => import('../components/Mine/Personal.vue'),
         meta: { title: "编辑个人信息" }
+    },
+    {
+        path: '/Following/:userId',
+        name: 'Following',
+        component: () => import('../components/Follow/Follow.vue'),
+        meta: { title: "正在关注" }
+    },
+    {
+        path: '/Followed/:userId',
+        name: 'Followed',
+        component: () => import('../components/Follow/Follow.vue'),
+        meta: { title: "正被关注" }
     }
 ]
 

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="avatar">
-      <img :src="info.userAvatar" @click="goProfile(info.id)"/>
+      <img :src="info.userAvatar" @click="goProfile(info.id)" />
     </div>
     <div class="user">
       <div class="name">{{ info.userName }}</div>
@@ -26,10 +26,7 @@
       v-if="!isFollowed"
       >关注TA</el-button
     >
-    <el-button
-      v-if="isFollowed"
-      round
-      @click="cancelFollwing(info.id)"
+    <el-button v-if="isFollowed" round @click="cancelFollwing(info.id)"
       >取消关注</el-button
     >
   </div>
@@ -42,13 +39,13 @@ export default {
   computed: {
     isFollowed() {
       for (var value of this.isFollowing) {
-        if (value == this.info.id) return true;
+        if (value.id == this.info.id) return true;
       }
       return false;
     },
   },
   methods: {
-       checkLogin() {
+    checkLogin() {
       if (this.$store.state.token == null) {
         this.$dialog
           .confirm({
@@ -69,18 +66,18 @@ export default {
       }
     },
     follwing(userId) {
-      if(this.checkLogin()){
-      this.axios({
-        method: "post",
-        url: "/jike-api/follow",
-        params: { followingUserId: userId },
-        headers: {
-          Authorization: this.$store.state.token,
-        },
-      }).then((resp) => {
-        this.$toast(resp.data.message);
-        this.$emit("reloadCard")
-      });
+      if (this.checkLogin()) {
+        this.axios({
+          method: "post",
+          url: "/jike-api/follow",
+          params: { followingUserId: userId },
+          headers: {
+            Authorization: this.$store.state.token,
+          },
+        }).then((resp) => {
+          this.$toast(resp.data.message);
+          this.$emit("reloadCard");
+        });
       }
     },
     cancelFollwing(userId) {
@@ -93,15 +90,15 @@ export default {
         },
       }).then((resp) => {
         this.$toast(resp.data.message);
-          this.$emit("reloadCard")
+        this.$emit("reloadCard");
       });
     },
-    goProfile(userId){
-        this.$router.push({
-          path: `/Others/${userId}`,
-        });
+    goProfile(userId) {
+      this.$router.push({
+        path: `/Others/${userId}`,
+      });
       event.stopPropagation();
-    }
+    },
   },
 };
 </script>

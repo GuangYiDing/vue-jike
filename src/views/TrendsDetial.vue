@@ -51,7 +51,7 @@ export default {
       replyUserInfo: {},
       replyPlaceHolder: "",
       likedTrend: [],
-      isFollowing:[]
+      isFollowing: [],
     };
   },
   mounted() {
@@ -177,33 +177,32 @@ export default {
           });
       }
     },
-     getFollowing() {
-       if (this.$store.state.token!=null) {
-
-      this.axios
-        .get("/jike-api/follow", {
-          headers: {
-            Authorization: this.$store.state.token,
-          },
-        })
-        .then((resp) => {
-          this.isFollowing = resp.data.data;
-        });         
-       }
+    getFollowing() {
+      if (this.$store.state.token != null) {
+        this.axios
+          .get("/jike-api/follow/Aing", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            this.isFollowing = resp.data.data;
+          });
+      }
     },
     reloadComm() {
       this.loadComments();
     },
     reloadContent() {
       this.loadContent();
-    this.getLikedTrend();
-        if (this.$store.state.token!=null) {
-          this.isFollowing();
-        }
+      this.getLikedTrend();
+      if (this.$store.state.token != null) {
+        this.isFollowing();
+      }
     },
-    reloadFollow(){
-          this.getFollowing();
-    }
+    reloadFollow() {
+      this.getFollowing();
+    },
   },
 };
 </script>

@@ -5,9 +5,13 @@
         <h2>记录我,遇见你</h2>
         <span>关注其他用户后,他们的动态会在动态中展示</span>
       </div>
-      <swiper ref="mySwiper" :options="swiperOptions" >
+      <swiper ref="mySwiper" :options="swiperOptions">
         <swiper-slide v-for="item in infos" :key="item.id">
-          <SwiperCard :info="item" :isFollowing="isFollowing"  @reloadCard="reloadCard"/>
+          <SwiperCard
+            :info="item"
+            :isFollowing="isFollowing"
+            @reloadCard="reloadCard"
+          />
         </swiper-slide>
       </swiper>
     </van-pull-refresh>
@@ -45,9 +49,9 @@ export default {
   },
   mounted() {
     this.getUserInfo();
-   if(this.$store.state.token!=null){
-    this.getFollowing();
-     }
+    if (this.$store.state.token != null) {
+      this.getFollowing();
+    }
   },
   methods: {
     // 根据生日的月份和日期，计算星座。
@@ -61,16 +65,18 @@ export default {
         this.infos = resp.data.data;
         this.infos.forEach((item) => {
           item.userAvatar = Iurl.perview + item.userAvatar;
-          item.astro = this.getAstro(
-            new Date(item.birthday).getMonth(),
-            new Date(item.birthday).getDay()
-          );
+          if (item.birthday != null) {
+            item.astro = this.getAstro(
+              new Date(item.birthday).getMonth(),
+              new Date(item.birthday).getDay()
+            );
+          }
         });
       });
     },
     getFollowing() {
       this.axios
-        .get("/jike-api/follow", {
+        .get("/jike-api/follow/Aing", {
           headers: {
             Authorization: this.$store.state.token,
           },
@@ -79,20 +85,20 @@ export default {
           this.isFollowing = resp.data.data;
         });
     },
-     async  onRefresh() {
-     await  this.getUserInfo();
-     if(this.$store.state.token!=null){
-      await  this.getFollowing();
-     }
-     this.isLoading = false;
+    async onRefresh() {
+      await this.getUserInfo();
+      if (this.$store.state.token != null) {
+        await this.getFollowing();
+      }
+      this.isLoading = false;
     },
- 
-    reloadCard(){
+
+    reloadCard() {
       this.getUserInfo();
-    if(this.$store.state.token!=null){
+      if (this.$store.state.token != null) {
         this.getFollowing();
-     }
-    }
+      }
+    },
   },
 };
 </script>
