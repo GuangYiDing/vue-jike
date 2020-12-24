@@ -2,13 +2,17 @@
   <div class="Friends">
     <van-nav-bar title="动态" />
     <Cards
-    v-if="this.$store.state.token!=null"
+      v-if="this.$store.state.token != null"
       :list="followingUserTrends"
       @cardsOnload="onload"
       @cardsOnRefresh="onRefresh"
       @reloadTrend="reloadTrend"
     />
-    <van-empty v-if="followingUserTrends.length == 0" image="search" description="你所关注的用户动态将在此展示" />
+    <van-empty
+      v-if="followingUserTrends.length == 0"
+      image="search"
+      description="你所关注的用户动态将在此展示"
+    />
     <footer>
       <tabbar></tabbar>
     </footer>
@@ -31,40 +35,45 @@ export default {
     };
   },
   mounted() {
+    // 挂载后获取关注用户的动态
     this.getFollowingUserTrends();
   },
   methods: {
+    // 获取用户动态
     getFollowingUserTrends() {
-      if (this.$store.state.token!=null) {
-      this.axios
-        .get("/jike-api/trend/following", {
-          headers: {
-            Authorization: this.$store.state.token,
-          },
-        })
-        .then((resp) => {
-          const list = resp.data.data;
-          list.filter((item) => {
-            let imageStr = item.images.slice(1, item.images.length - 1);
-            let imagesArr = imageStr.split(",");
-            let perviewArr = imagesArr.map((i) => {
-              return (i = Iurl.perview + i);
+      if (this.$store.state.token != null) {
+        this.axios
+          .get("/jike-api/trend/following", {
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((resp) => {
+            const list = resp.data.data;
+            list.filter((item) => {
+              let imageStr = item.images.slice(1, item.images.length - 1);
+              let imagesArr = imageStr.split(",");
+              let perviewArr = imagesArr.map((i) => {
+                return (i = Iurl.perview + i);
+              });
+              item.images = perviewArr;
+              item.userAvatar = Iurl.perview + item.userAvatar;
+              item.zoneAvatar = Iurl.perview + item.zoneAvatar;
             });
-            item.images = perviewArr;
-            item.userAvatar = Iurl.perview + item.userAvatar;
-            item.zoneAvatar = Iurl.perview + item.zoneAvatar;
+            this.followingUserTrends = list;
           });
-          this.followingUserTrends = list;
-        });       
       }
-          this.$toast.clear();
+      this.$toast.clear();
     },
+
     onload() {
       this.getFollowingUserTrends();
     },
+    // 重新获取
     async onRefresh() {
       await this.getFollowingUserTrends();
     },
+    // 重新获取
     reloadTrend() {
       this.getFollowingUserTrends();
     },

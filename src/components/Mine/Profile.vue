@@ -16,7 +16,13 @@
     <div class="top">
       <div class="one-line">
         <div class="avatar">
-          <van-image :src="userInfo.userAvatar" width="60" height="60" round>
+          <van-image
+            :src="userInfo.userAvatar"
+            width="60"
+            height="60"
+            round
+            @click="viewAvatar"
+          >
             <template v-slot:loading>
               <van-loading />
             </template>
@@ -103,7 +109,7 @@
 <script>
 import Iurl from "../../axios/constants";
 import Cards from "../Trends/Cards";
-
+import { ImagePreview } from "vant";
 export default {
   name: "Profile",
   components: { Cards },
@@ -189,10 +195,12 @@ export default {
           .then((resp) => {
             this.userInfo = resp.data.data;
             this.userInfo.userAvatar = Iurl.perview + resp.data.data.avatar;
+
             $(".top").css(
               "background-image",
               "url(" + Iurl.perview + resp.data.data.cover + ")"
             );
+            this.userInfo.cover = Iurl.perview + resp.data.data.cover;
           });
       } else {
         this.axios
@@ -203,10 +211,12 @@ export default {
             console.log(resp.data.data);
             this.userInfo = resp.data.data;
             this.userInfo.userAvatar = Iurl.perview + resp.data.data.avatar;
+
             $(".top").css(
               "background-image",
               "url(" + Iurl.perview + resp.data.data.cover + ")"
             );
+            this.userInfo.cover = Iurl.perview + resp.data.data.cover;
           });
       }
     },
@@ -360,6 +370,7 @@ export default {
       }).then((resp) => {
         this.$toast(resp.data.message);
         this.getAtuhFollowing();
+        this.getUserInfo();
       });
     },
     getAtuhFollowing() {
@@ -375,6 +386,9 @@ export default {
           });
       }
     },
+    viewAvatar() {
+      ImagePreview([this.userInfo.userAvatar, this.userInfo.cover]);
+    },
   },
 };
 </script>
@@ -387,7 +401,7 @@ export default {
   padding: 12px 12px 12px 24px;
   height: 25vh;
   background-size: cover;
-  background-image: url("https://gitee.com/xiaodingsiren/JikePic/raw/master/images/gcS0gSnipaste_2020-11-18_23-13-01.png");
+  /* background-image: url("https://gitee.com/xiaodingsiren/JikePic/raw/master/images/gcS0gSnipaste_2020-11-18_23-13-01.png"); */
 }
 .Profile .top div {
   margin: 6px 0px;

@@ -46,12 +46,7 @@
               successText="验证通过"
               handlerIcon="van-icon van-icon-arrow"
               successIcon="van-icon van-icon-success"
-              @passcallback="
-                () => {
-                  loginVerify = true;
-                  this.$toast.success('通过验证');
-                }
-              "
+              @passcallback="passcallback"
             />
           </div>
           <div class="button">
@@ -125,7 +120,6 @@
 
 <script>
 import dragVerify from "vue-drag-verify2";
-// import dragVerifyImgChip from "vue-drag-verify-img-chip";
 import dragVerifyImgChip from "../components/Login/DragVerifyImgChip";
 import qs from "qs";
 export default {
@@ -151,6 +145,11 @@ export default {
   mounted() {},
 
   methods: {
+    passcallback() {
+      this.loginVerify = true;
+      this.$toast.success("通过验证");
+    },
+    // 重置登录的输入和校验
     loginReset() {
       this.loginUserName = "";
       this.loginPassWord = "";
@@ -158,6 +157,7 @@ export default {
       this.loginVerify = false;
       this.$refs.dragVerify.reset();
     },
+    // 登录规则检查
     checkLogin() {
       if (this.loginUserName == "") {
         this.$toast.fail("用户名未填写");
@@ -175,6 +175,7 @@ export default {
       }
       return true;
     },
+    // 登录操作
     login() {
       if (this.checkLogin()) {
         this.axios
@@ -208,6 +209,7 @@ export default {
           });
       }
     },
+    // 重置注册
     signupReset() {
       this.signupUserName = "";
       this.signupPassWord = "";
@@ -215,8 +217,12 @@ export default {
       this.signupVerify = false;
       this.$refs.dragImgVerify.reset();
     },
+    // 注册规则检查
     checkSignup() {
-      if (this.signupUserName == "") {
+      if (this.signupUserName.length < 4) {
+        this.$toast.fail("用户名至少位四位字符");
+        return false;
+      } else if (this.signupUserName == "") {
         this.$toast.fail("用户名未填写");
         return false;
       } else if (this.signupPassWord == "") {
@@ -232,6 +238,7 @@ export default {
       }
       return true;
     },
+    // 注册操作
     signup() {
       if (this.checkSignup()) {
         this.axios
@@ -264,7 +271,7 @@ export default {
           });
       }
     },
-
+    // 拼图刷新
     imgChipRefresh() {},
   },
 };

@@ -67,8 +67,8 @@ export default {
           item.userAvatar = Iurl.perview + item.userAvatar;
           if (item.birthday != null) {
             item.astro = this.getAstro(
-              new Date(item.birthday).getMonth(),
-              new Date(item.birthday).getDay()
+              new Date(item.birthday).getMonth() + 1,
+              new Date(item.birthday).getDate()
             );
           }
         });

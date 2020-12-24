@@ -75,12 +75,16 @@ export default {
         })
         .then((resp) => {
           let item = resp.data.data;
-          let imageStr = item.images.slice(1, item.images.length - 1);
-          let imagesArr = imageStr.split(",");
-          let perviewArr = imagesArr.map((i) => {
-            return (i = Iurl.perview + i);
-          });
-          item.images = perviewArr;
+          if (item.images.length > 2) {
+            let imageStr = item.images.slice(1, item.images.length - 1);
+            let imagesArr = imageStr.split(",");
+            let perviewArr = imagesArr.map((i) => {
+              return (i = Iurl.perview + i);
+            });
+            item.images = perviewArr;
+          } else {
+            item.images = null;
+          }
           item.userAvatar = Iurl.perview + item.userAvatar;
           item.zoneAvatar = Iurl.perview + item.zoneAvatar;
           this.detailContent = item;

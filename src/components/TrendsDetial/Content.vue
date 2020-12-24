@@ -36,7 +36,10 @@
       </div>
     </header>
     <div class="desc">{{ this.content.content }}</div>
-    <div class="images" v-if="content.images > 0">
+    <div
+      class="images"
+      v-if="this.content.images != null && this.content.images.length > 0"
+    >
       <van-image
         :src="image"
         @click="viewImage"
